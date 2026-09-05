@@ -1,5 +1,4 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -36,5 +35,8 @@ Global
 		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A4B4E9A9-4F9F-4E69-9E68-1D53DBF6D8F5}
 	EndGlobalSection
 EndGlobal

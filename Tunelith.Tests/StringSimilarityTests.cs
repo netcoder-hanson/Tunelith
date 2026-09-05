@@ -37,15 +37,18 @@ public class StringSimilarityTests
     }
 
     [Theory]
-    [InlineData("Song Name", "song name", true)]
-    [InlineData("feat. Artist", "ft. Artist", true)]
-    [InlineData("Remix", "", false)]
-    public void NormalizeForComparison_RemovesNoiseWords(string input, string expectedContains, bool shouldRemove)
+    [InlineData("Song Name", "song name", false)]
+    [InlineData("Song Title feat. Artist", "feat", true)]
+    [InlineData("Track Remix", "remix", true)]
+    [InlineData("Album Remastered", "remaster", true)]
+    public void NormalizeForComparison_RemovesNoiseWords(string input, string noiseWord, bool shouldRemove)
     {
         var normalized = StringSimilarity.NormalizeForComparison(input);
-        Assert.False(normalized.Contains("feat"));
-        Assert.False(normalized.Contains("remix"));
-        Assert.False(normalized.Contains("remaster"));
+
+        if (shouldRemove)
+            Assert.DoesNotContain(noiseWord, normalized);
+        else
+            Assert.Equal(input.ToLowerInvariant(), normalized);
     }
 
     [Fact]

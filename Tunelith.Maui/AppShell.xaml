@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Tunelith.Maui.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:Tunelith.Maui.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Title="Tunelith"
+    Shell.BackgroundColor="{StaticResource BackgroundColor}"
+    Shell.ForegroundColor="{StaticResource PrimaryGold}"
+    Shell.TitleColor="{StaticResource TextPrimary}">
+
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="LoginPage" />
+
+    <ShellContent
+        Title="Library"
+        ContentTemplate="{DataTemplate views:LibraryPage}"
+        Route="LibraryPage" />
+
+    <ShellContent
+        Title="Categorize"
+        ContentTemplate="{DataTemplate views:CategorizationPage}"
+        Route="CategorizationPage" />
+
+    <ShellContent
+        Title="Report"
+        ContentTemplate="{DataTemplate views:ChangeReportPage}"
+        Route="ChangeReportPage" />
+
+</Shell>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
+             x:Class="Tunelith.Maui.Views.CategorizationPage"
+             Style="{StaticResource PageStyle}">
+
+    <ContentPage.BindingContext>
+        <vm:CategorizationViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
+
+        <!-- Header -->
+        <Label Grid.Row="0"
+               Text="Organize Library"
+               Style="{StaticResource TitleLabel}"
+               Margin="0,0,0,8"/>
+        <Label Grid.Row="0"
+               Text="AI-powered categorization"
+               Style="{StaticResource SubtitleLabel}"
+               Margin="0,40,0,0"/>
+
+        <!-- Progress -->
+        <VerticalStackLayout Grid.Row="1" Margin="0,12,0,16">
+            <ProgressBar Progress="{Binding ProgressPercent, Converter={StaticResource PercentToDoubleConverter}}"
+                         ProgressColor="{StaticResource PrimaryGold}"
+                         HeightRequest="4"/>
+            <Label Text="{Binding StatusMessage}"
+                   Style="{StaticResource BodyLabel}"
+                   FontSize="12"
+                   Margin="0,8,0,0"/>
+        </VerticalStackLayout>
+
+        <!-- Categories & Duplicates -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Categories -->
+                <Label Text="Categories Found"
+                       Style="{StaticResource AccentLabel}"
+                       IsVisible="{Binding Categories.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
+
+                <CollectionView ItemsSource="{Binding Categories}"
+                                SelectionMode="None"
+                                HeightRequest="{Binding Categories.Count, Converter={StaticResource CategoriesHeightConverter}}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:Object">
+                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Name}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
+                                        <Label Text="{Binding Description}" Style="{StaticResource SubtitleLabel}" FontSize="11"/>
+                                    </VerticalStackLayout>
+                                    <Frame Grid.Column="1"
+                                           Style="{StaticResource CategoryTag}"
+                                           VerticalOptions="Center">
+                                        <Label Text="{Binding TrackIds.Count, StringFormat='{0} tracks'}"
+                                               Style="{StaticResource AccentLabel}" FontSize="11"/>
+                                    </Frame>
+                                </Grid>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Duplicates -->
+                <Label Text="Duplicates Found"
+                       Style="{StaticResource AccentLabel}"
+                       Margin="0,8,0,0"
+                       IsVisible="{Binding Duplicates.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
+
+                <CollectionView ItemsSource="{Binding Duplicates}"
+                                SelectionMode="None"
+                                HeightRequest="{Binding Duplicates.Count, Converter={StaticResource DuplicatesHeightConverter}}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:Object">
+                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding Tracks[0].DisplayName}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Tracks[1].DisplayName}" Style="{StaticResource BodyLabel}"/>
+                                    <Label Text="{Binding Type, StringFormat='Type: {0}'}"
+                                           Style="{StaticResource SubtitleLabel}" FontSize="11"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Bottom -->
+        <VerticalStackLayout Grid.Row="3" Spacing="8" Margin="0,12,0,0">
+            <ActivityIndicator IsRunning="{Binding IsProcessing}"
+                               IsVisible="{Binding IsProcessing}"
+                               Style="{StaticResource GoldActivityIndicator}"/>
+            <Button Text="Run Categorization"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding RunCategorizationCommand}"/>
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- Color Tokens -->
+    <Color x:Key="BackgroundColor">#0D0D0D</Color>
+    <Color x:Key="SurfaceColor">#16162A</Color>
+    <Color x:Key="PrimaryGold">#FFD700</Color>
+    <Color x:Key="SecondaryCyan">#00E5FF</Color>
+    <Color x:Key="TextPrimary">#FFFFFF</Color>
+    <Color x:Key="TextSecondary">#A0A0B0</Color>
+    <Color x:Key="GlassBorderColor">#26FFD700</Color>
+    <Color x:Key="GlassBackgroundColor">#9916162A</Color>
+    <Color x:Key="DangerRed">#FF4444</Color>
+    <Color x:Key="SuccessGreen">#44FF88</Color>
+
+    <!-- Typography -->
+    <FontImage x:Key="SpotifyGreen" Glyph="" FontFamily=""/>
+
+    <!-- Glass Panel Style -->
+    <Style x:Key="GlassPanel" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource GlassBackgroundColor}"/>
+        <Setter Property="BorderColor" Value="{StaticResource GlassBorderColor}"/>
+        <Setter Property="CornerRadius" Value="16"/>
+        <Setter Property="HasShadow" Value="False"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Margin" Value="8"/>
+    </Style>
+
+    <!-- Primary Button (Gold) -->
+    <Style x:Key="PrimaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{StaticResource PrimaryGold}"/>
+        <Setter Property="TextColor" Value="{StaticResource BackgroundColor}"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="HeightRequest" Value="50"/>
+        <Setter Property="MinimumHeightRequest" Value="50"/>
+    </Style>
+
+    <!-- Secondary Button (Outline) -->
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="Transparent"/>
+        <Setter Property="TextColor" Value="{StaticResource PrimaryGold}"/>
+        <Setter Property="BorderColor" Value="{StaticResource PrimaryGold}"/>
+        <Setter Property="BorderWidth" Value="1.5"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="HeightRequest" Value="50"/>
+        <Setter Property="MinimumHeightRequest" Value="50"/>
+    </Style>
+
+    <!-- Page Background -->
+    <Style x:Key="PageStyle" TargetType="ContentPage">
+        <Setter Property="BackgroundColor" Value="{StaticResource BackgroundColor}"/>
+    </Style>
+
+    <!-- Title Label -->
+    <Style x:Key="TitleLabel" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <!-- Subtitle Label -->
+    <Style x:Key="SubtitleLabel" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+    <!-- Body Label -->
+    <Style x:Key="BodyLabel" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <!-- Accent Label -->
+    <Style x:Key="AccentLabel" TargetType="Label">
+        <Setter Property="TextColor" Value="{StaticResource SecondaryCyan}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontAttributes" Value="Bold"/>
+    </Style>
+
+    <!-- Category Tag -->
+    <Style x:Key="CategoryTag" TargetType="Frame">
+        <Setter Property="BackgroundColor" Value="{StaticResource GlassBackgroundColor}"/>
+        <Setter Property="BorderColor" Value="{StaticResource SecondaryCyan}"/>
+        <Setter Property="CornerRadius" Value="20"/>
+        <Setter Property="HasShadow" Value="False"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="Margin" Value="4"/>
+    </Style>
+
+    <!-- Activity Indicator -->
+    <Style x:Key="GoldActivityIndicator" TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{StaticResource PrimaryGold}"/>
+    </Style>
+
+</ResourceDictionary>

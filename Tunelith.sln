@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tunelith.Maui", "Tunelith.Maui\Tunelith.Maui.csproj", "{0B11681A-AE61-43D9-9F9F-51627E80B9F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tunelith.Core", "Tunelith.Core\Tunelith.Core.csproj", "{B7FA7698-7A09-4E4F-B2B5-CA344C5256E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tunelith.Data", "Tunelith.Data\Tunelith.Data.csproj", "{F05383C2-6A42-40D0-B6EA-F8CCE8BB2D11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tunelith.Tests", "Tunelith.Tests\Tunelith.Tests.csproj", "{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B11681A-AE61-43D9-9F9F-51627E80B9F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B11681A-AE61-43D9-9F9F-51627E80B9F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B11681A-AE61-43D9-9F9F-51627E80B9F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B11681A-AE61-43D9-9F9F-51627E80B9F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7FA7698-7A09-4E4F-B2B5-CA344C5256E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7FA7698-7A09-4E4F-B2B5-CA344C5256E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7FA7698-7A09-4E4F-B2B5-CA344C5256E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7FA7698-7A09-4E4F-B2B5-CA344C5256E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F05383C2-6A42-40D0-B6EA-F8CCE8BB2D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F05383C2-6A42-40D0-B6EA-F8CCE8BB2D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F05383C2-6A42-40D0-B6EA-F8CCE8BB2D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F05383C2-6A42-40D0-B6EA-F8CCE8BB2D11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E61EFD2D-FCB7-4EEC-BC21-075CCECD4114}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

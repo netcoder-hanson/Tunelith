@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
+             x:Class="Tunelith.Maui.Views.LoginPage"
+             Style="{StaticResource PageStyle}">
+
+    <ContentPage.BindingContext>
+        <vm:LoginViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="24">
+
+        <!-- Logo & Title -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16">
+            <Label Text="TUNELITH"
+                   Style="{StaticResource TitleLabel}"
+                   FontSize="42"
+                   HorizontalTextAlignment="Center"/>
+            <Label Text="Organize your Spotify library"
+                   Style="{StaticResource SubtitleLabel}"
+                   HorizontalTextAlignment="Center"/>
+            <Label Text="Powered by AI-driven categorization"
+                   Style="{StaticResource AccentLabel}"
+                   FontSize="12"
+                   HorizontalTextAlignment="Center"/>
+        </VerticalStackLayout>
+
+        <!-- Status & Loading -->
+        <VerticalStackLayout Grid.Row="1"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="12">
+            <ActivityIndicator IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Style="{StaticResource GoldActivityIndicator}"/>
+            <Label Text="{Binding StatusMessage}"
+                   Style="{StaticResource BodyLabel}"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource IsNotNullConverter}}"/>
+        </VerticalStackLayout>
+
+        <!-- Login Button -->
+        <Button Grid.Row="2"
+                Text="Connect with Spotify"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding LoginCommand}"
+                Margin="0,0,0,40"/>
+
+    </Grid>
+
+</ContentPage>

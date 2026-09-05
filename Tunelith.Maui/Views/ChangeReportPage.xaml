@@ -5,9 +5,7 @@
              x:Class="Tunelith.Maui.Views.ChangeReportPage"
              Style="{StaticResource PageStyle}">
 
-    <ContentPage.BindingContext>
-        <vm:ChangeReportViewModel />
-    </ContentPage.BindingContext>
+    <!-- BindingContext set in code-behind via DI -->
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
 
@@ -58,7 +56,7 @@
                 <CollectionView ItemsSource="{Binding Report.PlaylistsToCreate}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="x:Object">
+                        <DataTemplate>
                             <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <VerticalStackLayout Grid.Column="0" Spacing="2">
@@ -71,7 +69,7 @@
                                            CornerRadius="8"
                                            Padding="8,4"
                                            VerticalOptions="Center">
-                                        <Label Text="NEW" Color="{StaticResource BackgroundColor}" FontSize="10" FontAttributes="Bold"/>
+                                        <Label Text="NEW" TextColor="{StaticResource BackgroundColor}" FontSize="10" FontAttributes="Bold"/>
                                     </Frame>
                                 </Grid>
                             </Frame>
@@ -88,7 +86,7 @@
                 <CollectionView ItemsSource="{Binding Report.DuplicatesToRemove}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="x:Object">
+                        <DataTemplate>
                             <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
                                 <VerticalStackLayout Spacing="4">
                                     <Label Text="{Binding Tracks[0].DisplayName}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>

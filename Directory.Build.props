@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <AndroidSdkDirectory>/home/hanson/android-sdk</AndroidSdkDirectory>
+  </PropertyGroup>
+</Project>

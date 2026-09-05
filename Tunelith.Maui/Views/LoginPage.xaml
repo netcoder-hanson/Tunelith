@@ -5,9 +5,7 @@
              x:Class="Tunelith.Maui.Views.LoginPage"
              Style="{StaticResource PageStyle}">
 
-    <ContentPage.BindingContext>
-        <vm:LoginViewModel />
-    </ContentPage.BindingContext>
+    <!-- BindingContext set in code-behind via DI -->
 
     <Grid RowDefinitions="*,Auto,Auto" Padding="24">
 

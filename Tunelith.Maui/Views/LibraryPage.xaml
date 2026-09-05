@@ -5,9 +5,7 @@
              x:Class="Tunelith.Maui.Views.LibraryPage"
              Style="{StaticResource PageStyle}">
 
-    <ContentPage.BindingContext>
-        <vm:LibraryViewModel />
-    </ContentPage.BindingContext>
+    <!-- BindingContext set in code-behind via DI -->
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
 
@@ -57,7 +55,7 @@
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="x:Object">
+                <DataTemplate>
                     <Frame Style="{StaticResource GlassPanel}" Padding="16" Margin="0,4">
                         <Grid ColumnDefinitions="*,Auto">
                             <VerticalStackLayout Grid.Column="0" Spacing="4">

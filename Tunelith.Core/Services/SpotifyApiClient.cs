@@ -7,6 +7,7 @@ namespace Tunelith.Core.Services;
 public interface ISpotifyApiClient
 {
     Task SetTokenAsync(string accessToken);
+    void SetRefreshToken(string refreshToken);
     Task<SpotifyUser> GetCurrentUserIdAsync();
     Task<List<SpotifyTrack>> GetLikedSongsAsync(IProgress<int>? progress = null);
     Task<List<SpotifyPlaylist>> GetUserPlaylistsAsync();
@@ -22,13 +23,17 @@ public class SpotifyApiClient : ISpotifyApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly RateLimitHandler _rateLimitHandler;
+    private readonly ISpotifyAuthService _authService;
     private string _accessToken = string.Empty;
+    private string _refreshToken = string.Empty;
+    private bool _isRefreshing;
     private const string BaseUrl = "https://api.spotify.com/v1";
 
-    public SpotifyApiClient(HttpClient httpClient, RateLimitHandler rateLimitHandler)
+    public SpotifyApiClient(HttpClient httpClient, RateLimitHandler rateLimitHandler, ISpotifyAuthService authService)
     {
         _httpClient = httpClient;
         _rateLimitHandler = rateLimitHandler;
+        _authService = authService;
     }
 
     public Task SetTokenAsync(string accessToken)
@@ -37,6 +42,11 @@ public class SpotifyApiClient : ISpotifyApiClient
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", accessToken);
         return Task.CompletedTask;
+    }
+
+    public void SetRefreshToken(string refreshToken)
+    {
+        _refreshToken = refreshToken;
     }
 
     public async Task<SpotifyUser> GetCurrentUserIdAsync()
@@ -62,11 +72,7 @@ public class SpotifyApiClient : ISpotifyApiClient
             offset += response.Items.Count;
             progress?.Report(offset);
 
-            url = response.Next != null ? null : null;
-            if (response.Next != null)
-            {
-                url = $"/me/tracks?limit=50&offset={offset}";
-            }
+            url = response.Next != null ? $"/me/tracks?limit=50&offset={offset}" : null;
         }
 
         return allTracks;
@@ -88,11 +94,7 @@ public class SpotifyApiClient : ISpotifyApiClient
             allPlaylists.AddRange(response.Items);
             offset += response.Items.Count;
 
-            url = response.Next != null ? null : null;
-            if (response.Next != null)
-            {
-                url = $"/me/playlists?limit=50&offset={offset}";
-            }
+            url = response.Next != null ? $"/me/playlists?limit=50&offset={offset}" : null;
         }
 
         return allPlaylists;
@@ -216,6 +218,22 @@ public class SpotifyApiClient : ISpotifyApiClient
     private async Task<T> GetAsync<T>(string endpoint)
     {
         var response = await _httpClient.GetAsync($"{BaseUrl}{endpoint}");
+
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            var retryDelay = _rateLimitHandler.GetRetryDelayFromResponse(response);
+            if (retryDelay <= TimeSpan.Zero)
+                retryDelay = _rateLimitHandler.GetSpotifyRetryDelay(0);
+            await Task.Delay(retryDelay);
+            response = await _httpClient.GetAsync($"{BaseUrl}{endpoint}");
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && !string.IsNullOrEmpty(_refreshToken))
+        {
+            await RefreshAndRetryAsync();
+            response = await _httpClient.GetAsync($"{BaseUrl}{endpoint}");
+        }
+
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(json) ?? throw new JsonException("Failed to deserialize");
@@ -224,6 +242,24 @@ public class SpotifyApiClient : ISpotifyApiClient
     private async Task<T> PostAsync<T>(string endpoint, HttpContent content)
     {
         var response = await _httpClient.PostAsync($"{BaseUrl}{endpoint}", content);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            var retryDelay = _rateLimitHandler.GetRetryDelayFromResponse(response);
+            if (retryDelay <= TimeSpan.Zero)
+                retryDelay = _rateLimitHandler.GetSpotifyRetryDelay(0);
+            await Task.Delay(retryDelay);
+            content = await CloneContentAsync(content);
+            response = await _httpClient.PostAsync($"{BaseUrl}{endpoint}", content);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && !string.IsNullOrEmpty(_refreshToken))
+        {
+            await RefreshAndRetryAsync();
+            content = await CloneContentAsync(content);
+            response = await _httpClient.PostAsync($"{BaseUrl}{endpoint}", content);
+        }
+
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<T>(json) ?? throw new JsonException("Failed to deserialize");
@@ -232,11 +268,73 @@ public class SpotifyApiClient : ISpotifyApiClient
     private async Task<T> SendAsync<T>(HttpRequestMessage request)
     {
         var response = await _httpClient.SendAsync(request);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        {
+            var retryDelay = _rateLimitHandler.GetRetryDelayFromResponse(response);
+            if (retryDelay <= TimeSpan.Zero)
+                retryDelay = _rateLimitHandler.GetSpotifyRetryDelay(0);
+            await Task.Delay(retryDelay);
+            request = await CloneRequestAsync(request);
+            response = await _httpClient.SendAsync(request);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && !string.IsNullOrEmpty(_refreshToken))
+        {
+            await RefreshAndRetryAsync();
+            request = await CloneRequestAsync(request);
+            response = await _httpClient.SendAsync(request);
+        }
+
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync();
         if (string.IsNullOrWhiteSpace(json))
             return default!;
         return JsonSerializer.Deserialize<T>(json) ?? throw new JsonException("Failed to deserialize");
+    }
+
+    private async Task RefreshAndRetryAsync()
+    {
+        if (_isRefreshing) return;
+        _isRefreshing = true;
+
+        try
+        {
+            var token = await _authService.RefreshTokenAsync(_refreshToken);
+            _accessToken = token.AccessToken;
+            if (!string.IsNullOrEmpty(token.RefreshToken))
+                _refreshToken = token.RefreshToken;
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", _accessToken);
+        }
+        finally
+        {
+            _isRefreshing = false;
+        }
+    }
+
+    private static async Task<HttpContent> CloneContentAsync(HttpContent original)
+    {
+        if (original is StringContent stringContent)
+        {
+            var content = await stringContent.ReadAsStringAsync();
+            return new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+        }
+        return original;
+    }
+
+    private static async Task<HttpRequestMessage> CloneRequestAsync(HttpRequestMessage original)
+    {
+        var clone = new HttpRequestMessage(original.Method, original.RequestUri);
+        if (original.Content != null)
+        {
+            var content = await original.Content.ReadAsStringAsync();
+            clone.Content = new StringContent(content, System.Text.Encoding.UTF8, "application/json");
+        }
+        foreach (var header in original.Headers)
+            clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+        return clone;
     }
 
     private class SpotifyAudioFeaturesResponse

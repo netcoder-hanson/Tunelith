@@ -78,6 +78,21 @@ public class RateLimitHandler
         throw new InvalidOperationException("Max retries exceeded");
     }
 
+    public TimeSpan GetRetryDelayFromResponse(HttpResponseMessage response)
+    {
+        if (response.Headers.RetryAfter?.Delta.HasValue == true)
+            return response.Headers.RetryAfter.Delta.Value;
+
+        if (response.Headers.RetryAfter?.Date.HasValue == true)
+        {
+            var waitUntil = response.Headers.RetryAfter.Date.Value - DateTimeOffset.UtcNow;
+            if (waitUntil > TimeSpan.Zero)
+                return waitUntil;
+        }
+
+        return TimeSpan.Zero;
+    }
+
     public TimeSpan GetSpotifyRetryDelay(int attempt)
     {
         return TimeSpan.FromMilliseconds(BaseDelayMs * Math.Pow(2, attempt));

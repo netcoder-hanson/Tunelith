@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tunelith.Core.Services;
 using Tunelith.Data;
+using Tunelith.Maui.Services;
 using Tunelith.Maui.ViewModels;
 using Tunelith.Maui.Views;
 
@@ -23,6 +24,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new TunelithDbContext(dbPath));
 
 		builder.Services.AddSingleton<RateLimitHandler>();
+		builder.Services.AddSingleton<ISecureStorageService, MauiSecureStorageService>();
 		builder.Services.AddHttpClient<ISpotifyAuthService, SpotifyAuthService>();
 		builder.Services.AddHttpClient<ISpotifyApiClient, SpotifyApiClient>();
 		builder.Services.AddHttpClient<IGeminiService, GeminiService>();

@@ -7,7 +7,6 @@ namespace Tunelith.Maui.ViewModels;
 public class LoginViewModel : ViewModelBase
 {
     private readonly ISpotifyAuthService _authService;
-    private readonly TunelithDbContext _dbContext;
 
     private bool _isLoading;
     public bool IsLoading
@@ -25,10 +24,9 @@ public class LoginViewModel : ViewModelBase
 
     public AsyncRelayCommand LoginCommand { get; }
 
-    public LoginViewModel(ISpotifyAuthService authService, TunelithDbContext dbContext)
+    public LoginViewModel(ISpotifyAuthService authService)
     {
         _authService = authService;
-        _dbContext = dbContext;
         LoginCommand = new AsyncRelayCommand(LoginAsync);
     }
 
@@ -39,7 +37,7 @@ public class LoginViewModel : ViewModelBase
 
         try
         {
-            var authUrl = _authService.GetAuthorizationUrl();
+            var authUrl = await _authService.GetAuthorizationUrlAsync();
 
             var callbackUrl = new Uri("tunelith://callback");
             var result = await WebAuthenticator.AuthenticateAsync(
@@ -49,8 +47,7 @@ public class LoginViewModel : ViewModelBase
             {
                 StatusMessage = "Authenticating...";
 
-                var codeVerifier = await SecureStorage.GetAsync("pkce_code_verifier") ?? string.Empty;
-                var token = await _authService.ExchangeCodeForTokenAsync(code, codeVerifier);
+                var token = await _authService.ExchangeCodeForTokenAsync(code);
 
                 await SecureStorage.SetAsync("spotify_access_token", token.AccessToken);
                 await SecureStorage.SetAsync("spotify_refresh_token", token.RefreshToken);

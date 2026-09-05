@@ -2,8 +2,8 @@ namespace Tunelith.Core.Services;
 
 public interface ISpotifyAuthService
 {
-    string GetAuthorizationUrl();
-    Task<TokenResponse> ExchangeCodeForTokenAsync(string code, string codeVerifier);
+    Task<string> GetAuthorizationUrlAsync();
+    Task<TokenResponse> ExchangeCodeForTokenAsync(string code);
     Task<TokenResponse> RefreshTokenAsync(string refreshToken);
     bool IsTokenValid(TokenResponse token);
 }
@@ -21,20 +21,25 @@ public class TokenResponse
 public class SpotifyAuthService : ISpotifyAuthService
 {
     private readonly HttpClient _httpClient;
+    private readonly ISecureStorageService _secureStorage;
     private const string ClientId = "YOUR_SPOTIFY_CLIENT_ID";
     private const string RedirectUri = "tunelith://callback";
     private const string AuthEndpoint = "https://accounts.spotify.com/authorize";
     private const string TokenEndpoint = "https://accounts.spotify.com/api/token";
     private const string Scopes = "user-library-read playlist-read-private playlist-modify-private playlist-modify-public";
+    private const string VerifierKey = "pkce_code_verifier";
 
-    public SpotifyAuthService(HttpClient httpClient)
+    public SpotifyAuthService(HttpClient httpClient, ISecureStorageService secureStorage)
     {
         _httpClient = httpClient;
+        _secureStorage = secureStorage;
     }
 
-    public string GetAuthorizationUrl()
+    public async Task<string> GetAuthorizationUrlAsync()
     {
         var codeVerifier = GenerateCodeVerifier();
+        await _secureStorage.SetAsync(VerifierKey, codeVerifier);
+
         var codeChallenge = GenerateCodeChallenge(codeVerifier);
 
         var parameters = new Dictionary<string, string>
@@ -53,8 +58,10 @@ public class SpotifyAuthService : ISpotifyAuthService
         return $"{AuthEndpoint}?{queryString}";
     }
 
-    public async Task<TokenResponse> ExchangeCodeForTokenAsync(string code, string codeVerifier)
+    public async Task<TokenResponse> ExchangeCodeForTokenAsync(string code)
     {
+        var codeVerifier = await _secureStorage.GetAsync(VerifierKey) ?? string.Empty;
+
         var content = new FormUrlEncodedContent(new Dictionary<string, string>
         {
             ["client_id"] = ClientId,

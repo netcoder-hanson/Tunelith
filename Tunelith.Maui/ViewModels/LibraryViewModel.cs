@@ -102,6 +102,10 @@ public class LibraryViewModel : ViewModelBase
 
             await _spotifyClient.SetTokenAsync(accessToken);
 
+            var refreshToken = await SecureStorage.GetAsync("spotify_refresh_token");
+            if (!string.IsNullOrEmpty(refreshToken))
+                _spotifyClient.SetRefreshToken(refreshToken);
+
             StatusMessage = "Fetching liked songs...";
             var likedSongs = await _spotifyClient.GetLikedSongsAsync();
             LikedSongsCount = likedSongs.Count;

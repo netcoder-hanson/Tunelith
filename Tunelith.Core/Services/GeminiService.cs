@@ -176,14 +176,32 @@ Respond with JSON only:
                 var responseJson = await response.Content.ReadAsStringAsync(ct);
                 var doc = JsonSerializer.Deserialize<JsonElement>(responseJson);
 
-                return doc
+                var rawText = doc
                     .GetProperty("candidates")[0]
                     .GetProperty("content")
                     .GetProperty("parts")[0]
                     .GetProperty("text")
                     .GetString() ?? string.Empty;
+
+                return StripCodeFences(rawText);
             },
             _rateLimitHandler.GetGeminiRetryDelay,
             cancellationToken);
+    }
+
+    private static string StripCodeFences(string text)
+    {
+        var cleaned = text.Trim();
+        if (cleaned.StartsWith("```"))
+        {
+            var firstNewline = cleaned.IndexOf('\n');
+            if (firstNewline >= 0)
+                cleaned = cleaned[(firstNewline + 1)..];
+
+            var lastFence = cleaned.LastIndexOf("```");
+            if (lastFence >= 0)
+                cleaned = cleaned[..lastFence];
+        }
+        return cleaned.Trim();
     }
 }

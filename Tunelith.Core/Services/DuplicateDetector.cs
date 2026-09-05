@@ -75,38 +75,47 @@ public class DuplicateDetector
     private List<DedupeCandidate> FindNearDuplicateCandidates(List<CategorizedTrack> tracks)
     {
         var candidates = new List<DedupeCandidate>();
-        var processed = new HashSet<string>();
 
-        for (int i = 0; i < tracks.Count; i++)
+        var buckets = new Dictionary<string, List<CategorizedTrack>>();
+        foreach (var track in tracks)
         {
-            for (int j = i + 1; j < tracks.Count; j++)
+            var normalizedArtist = StringSimilarity.NormalizeForComparison(track.Track.ArtistNames);
+            var bucketKey = normalizedArtist.Length >= 2 ? normalizedArtist[..2] : normalizedArtist;
+
+            if (!buckets.ContainsKey(bucketKey))
+                buckets[bucketKey] = new List<CategorizedTrack>();
+            buckets[bucketKey].Add(track);
+        }
+
+        foreach (var bucket in buckets.Values)
+        {
+            for (int i = 0; i < bucket.Count; i++)
             {
-                var trackA = tracks[i].Track;
-                var trackB = tracks[j].Track;
-
-                if (trackA.Id == trackB.Id) continue;
-
-                var keyA = $"{trackA.Id}-{trackB.Id}";
-                if (processed.Contains(keyA)) continue;
-                processed.Add(keyA);
-
-                var normalizedA = StringSimilarity.NormalizeForComparison(trackA.DisplayName);
-                var normalizedB = StringSimilarity.NormalizeForComparison(trackB.DisplayName);
-
-                var similarity = StringSimilarity.CombinedSimilarity(normalizedA, normalizedB);
-
-                if (similarity >= PreFilterThreshold)
+                for (int j = i + 1; j < bucket.Count; j++)
                 {
-                    candidates.Add(new DedupeCandidate
+                    var trackA = bucket[i].Track;
+                    var trackB = bucket[j].Track;
+
+                    if (trackA.Id == trackB.Id) continue;
+
+                    var normalizedA = StringSimilarity.NormalizeForComparison(trackA.DisplayName);
+                    var normalizedB = StringSimilarity.NormalizeForComparison(trackB.DisplayName);
+
+                    var similarity = StringSimilarity.CombinedSimilarity(normalizedA, normalizedB);
+
+                    if (similarity >= PreFilterThreshold)
                     {
-                        TrackAId = trackA.Id,
-                        TrackAName = trackA.Name,
-                        TrackAArtist = trackA.ArtistNames,
-                        TrackBId = trackB.Id,
-                        TrackBName = trackB.Name,
-                        TrackBArtist = trackB.ArtistNames,
-                        StringSimilarity = similarity
-                    });
+                        candidates.Add(new DedupeCandidate
+                        {
+                            TrackAId = trackA.Id,
+                            TrackAName = trackA.Name,
+                            TrackAArtist = trackA.ArtistNames,
+                            TrackBId = trackB.Id,
+                            TrackBName = trackB.Name,
+                            TrackBArtist = trackB.ArtistNames,
+                            StringSimilarity = similarity
+                        });
+                    }
                 }
             }
         }

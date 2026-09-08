@@ -50,18 +50,18 @@
                           ColumnDefinitions="Auto,*,Auto,Auto"
                           Margin="0,0,0,8"
                           BackgroundColor="{StaticResource SurfaceColor}">
-                        <!-- Album art placeholder -->
+                        <!-- Album art -->
                         <Frame Grid.Column="0"
                                BackgroundColor="{StaticResource SurfaceLight}"
                                CornerRadius="8"
                                Padding="0"
                                HeightRequest="48" WidthRequest="48"
                                HasShadow="False"
-                               BorderColor="Transparent">
-                            <Label Text="🎵"
-                                   FontSize="18"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
+                               BorderColor="Transparent"
+                               IsClippedToBounds="True">
+                            <Image Source="{Binding ImageUrl}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="48" WidthRequest="48"/>
                         </Frame>
 
                         <!-- Track info -->

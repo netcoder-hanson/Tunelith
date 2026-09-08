@@ -8,11 +8,12 @@
 
     <Grid RowDefinitions="*,Auto" Padding="0">
 
-        <!-- Center Content -->
+        <!-- Center Content (normal analysis UI) -->
         <VerticalStackLayout Grid.Row="0"
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
-                             Spacing="0">
+                             Spacing="0"
+                             IsVisible="{Binding HasError, Converter={StaticResource InverseBoolConverter}}">
 
             <!-- Circular Progress Ring -->
             <Grid WidthRequest="180" HeightRequest="180"
@@ -64,6 +65,46 @@
                    TextColor="{StaticResource TextSecondary}"
                    HorizontalTextAlignment="Center"/>
 
+        </VerticalStackLayout>
+
+        <!-- Error UI (shown when analysis fails) -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="16"
+                             Padding="40"
+                             IsVisible="{Binding HasError}">
+
+            <Grid WidthRequest="80" HeightRequest="80"
+                  HorizontalOptions="Center">
+                <Ellipse Fill="{StaticResource SurfaceColor}"
+                         Stroke="{StaticResource DangerRed}"
+                         StrokeThickness="2"/>
+                <Label Text="⚠"
+                       FontSize="32"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <Label Text="Analysis Failed"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   HorizontalTextAlignment="Center"/>
+
+            <Label Text="{Binding ErrorMessage}"
+                   FontSize="14"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center"/>
+
+            <Button Text="Retry"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding RetryCommand}"
+                    Margin="0,8,0,0"/>
+
+            <Button Text="Go Back"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding GoBackCommand}"/>
         </VerticalStackLayout>
 
         <!-- Live Analysis Card -->

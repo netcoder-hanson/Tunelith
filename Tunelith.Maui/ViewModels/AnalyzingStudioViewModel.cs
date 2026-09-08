@@ -82,6 +82,23 @@ public class AnalyzingStudioViewModel : ViewModelBase
         set => SetProperty(ref _step4Pending, value);
     }
 
+    private bool _hasError;
+    public bool HasError
+    {
+        get => _hasError;
+        set => SetProperty(ref _hasError, value);
+    }
+
+    private string _errorMessage = string.Empty;
+    public string ErrorMessage
+    {
+        get => _errorMessage;
+        set => SetProperty(ref _errorMessage, value);
+    }
+
+    public AsyncRelayCommand RetryCommand { get; }
+    public AsyncRelayCommand GoBackCommand { get; }
+
     public AnalyzingStudioViewModel(
         ISpotifyApiClient spotifyClient,
         TunelithDbContext dbContext,
@@ -94,6 +111,9 @@ public class AnalyzingStudioViewModel : ViewModelBase
         _categorizationEngine = categorizationEngine;
         _duplicateDetector = duplicateDetector;
         _session = session;
+
+        RetryCommand = new AsyncRelayCommand(RetryAsync);
+        GoBackCommand = new AsyncRelayCommand(GoBackAsync);
     }
 
     public async Task RunAnalysisAsync()
@@ -204,11 +224,40 @@ public class AnalyzingStudioViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            HasError = true;
+            ErrorMessage = $"Analysis failed: {ex.Message}";
+            StatusMessage = "Something went wrong.";
         }
         finally
         {
             IsProcessing = false;
         }
+    }
+
+    private async Task RetryAsync()
+    {
+        ResetState();
+        await RunAnalysisAsync();
+    }
+
+    private async Task GoBackAsync()
+    {
+        ResetState();
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private void ResetState()
+    {
+        HasError = false;
+        ErrorMessage = string.Empty;
+        IsProcessing = true;
+        ProgressPercent = 0;
+        Step1Complete = false;
+        Step2Complete = false;
+        Step3Active = false;
+        Step3Complete = false;
+        Step4Pending = true;
+        CurrentStep = string.Empty;
+        StatusMessage = string.Empty;
     }
 }

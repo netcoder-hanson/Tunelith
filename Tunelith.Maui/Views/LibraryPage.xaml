@@ -23,7 +23,7 @@
                        Margin="0,2,0,0"/>
             </VerticalStackLayout>
 
-            <!-- User avatar placeholder -->
+            <!-- Logout button -->
             <Frame Grid.Column="1"
                    BackgroundColor="{StaticResource SurfaceColor}"
                    BorderColor="{StaticResource CardBorder}"
@@ -31,6 +31,9 @@
                    Padding="0"
                    HeightRequest="40" WidthRequest="40"
                    HasShadow="False">
+                <Frame.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding LogoutCommand}"/>
+                </Frame.GestureRecognizers>
                 <Label Text="👤"
                        FontSize="16"
                        HorizontalOptions="Center"
@@ -73,21 +76,25 @@
             </Frame>
         </Grid>
 
-        <!-- Potential Duplicates -->
+        <!-- Potential Duplicates (hidden until analysis exists) -->
         <Frame Grid.Row="2"
                Style="{StaticResource StatCard}"
                Padding="20,16"
                Margin="24,12,24,0"
-               IsVisible="{Binding TotalTracks, Converter={StaticResource IsGreaterThanZeroConverter}}">
+               IsVisible="{Binding HasAnalysis}">
             <Grid ColumnDefinitions="*,Auto">
                 <VerticalStackLayout Grid.Column="0" Spacing="2">
                     <Label Text="Potential Duplicates"
                            FontSize="15"
                            FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimary}"/>
-                    <Label Text="Estimated 34 tracks across your library."
-                           FontSize="12"
-                           TextColor="{StaticResource TextSecondary}"/>
+                    <Label FontSize="12"
+                           TextColor="{StaticResource TextSecondary}">
+                        <Label.Text>
+                            <Binding Path="EstimatedDuplicates"
+                                     StringFormat="Estimated {0} tracks across your library."/>
+                        </Label.Text>
+                    </Label>
                 </VerticalStackLayout>
 
                 <Frame Grid.Column="1"
@@ -97,10 +104,14 @@
                        HasShadow="False"
                        BorderColor="Transparent"
                        VerticalOptions="Center">
-                    <Label Text="34 FOUND"
-                           FontSize="10"
+                    <Label FontSize="10"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource BackgroundColor}"/>
+                           TextColor="{StaticResource BackgroundColor}">
+                        <Label.Text>
+                            <Binding Path="EstimatedDuplicates"
+                                     StringFormat="{}{0} FOUND"/>
+                        </Label.Text>
+                    </Label>
                 </Frame>
             </Grid>
         </Frame>

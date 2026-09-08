@@ -47,6 +47,20 @@ public class LibraryViewModel : ViewModelBase
         set => SetProperty(ref _totalTracks, value);
     }
 
+    private int _estimatedDuplicates;
+    public int EstimatedDuplicates
+    {
+        get => _estimatedDuplicates;
+        set => SetProperty(ref _estimatedDuplicates, value);
+    }
+
+    private bool _hasAnalysis;
+    public bool HasAnalysis
+    {
+        get => _hasAnalysis;
+        set => SetProperty(ref _hasAnalysis, value);
+    }
+
     private List<CachedPlaylist> _playlists = new();
     public List<CachedPlaylist> Playlists
     {
@@ -56,6 +70,7 @@ public class LibraryViewModel : ViewModelBase
 
     public AsyncRelayCommand ScanLibraryCommand { get; }
     public AsyncRelayCommand StartCategorizationCommand { get; }
+    public AsyncRelayCommand LogoutCommand { get; }
 
     public LibraryViewModel(
         ISpotifyApiClient spotifyClient,
@@ -72,6 +87,7 @@ public class LibraryViewModel : ViewModelBase
 
         ScanLibraryCommand = new AsyncRelayCommand(ScanLibraryAsync);
         StartCategorizationCommand = new AsyncRelayCommand(StartCategorizationAsync);
+        LogoutCommand = new AsyncRelayCommand(LogoutAsync);
     }
 
     public async Task InitializeAsync()
@@ -84,6 +100,15 @@ public class LibraryViewModel : ViewModelBase
             PlaylistsCount = Playlists.Count;
             TotalTracks = cachedCount + Playlists.Sum(p => p.TotalTracks);
         }
+
+        HasAnalysis = await _dbContext.GetCachedTrackCountAsync() > 0;
+    }
+
+    public async Task LogoutAsync()
+    {
+        SecureStorage.Remove("spotify_access_token");
+        SecureStorage.Remove("spotify_refresh_token");
+        await Shell.Current.GoToAsync("//LoginPage");
     }
 
     private async Task ScanLibraryAsync()

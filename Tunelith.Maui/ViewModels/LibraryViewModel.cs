@@ -147,6 +147,8 @@ public class LibraryViewModel : ViewModelBase
             TotalTracks = LikedSongsCount + Playlists.Sum(p => p.TotalTracks);
 
             StatusMessage = $"Scanned {LikedSongsCount} liked songs and {PlaylistsCount} playlists.";
+
+            await Shell.Current.GoToAsync("AnalyzingStudioPage");
         }
         catch (Exception ex)
         {

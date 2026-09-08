@@ -3,50 +3,111 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
              x:Class="Tunelith.Maui.Views.LoginPage"
-             Style="{StaticResource PageStyle}">
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
 
-    <!-- BindingContext set in code-behind via DI -->
+    <Grid RowDefinitions="*,Auto" Padding="0">
 
-    <Grid RowDefinitions="*,Auto,Auto" Padding="24">
-
-        <!-- Logo & Title -->
+        <!-- Top Section - Logo & Welcome -->
         <VerticalStackLayout Grid.Row="0"
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
-                             Spacing="16">
+                             Spacing="0"
+                             Padding="32">
+
+            <!-- App Icon with glow -->
+            <Grid WidthRequest="80" HeightRequest="80"
+                  HorizontalOptions="Center" Margin="0,0,0,20">
+                <Frame BackgroundColor="{StaticResource SurfaceColor}"
+                       BorderColor="{StaticResource CardBorder}"
+                       CornerRadius="18"
+                       Padding="0"
+                       HasShadow="False">
+                    <Label Text="🎛"
+                           FontSize="32"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Frame>
+            </Grid>
+
+            <!-- App Title -->
             <Label Text="TUNELITH"
-                   Style="{StaticResource TitleLabel}"
-                   FontSize="42"
-                   HorizontalTextAlignment="Center"/>
-            <Label Text="Organize your Spotify library"
-                   Style="{StaticResource SubtitleLabel}"
-                   HorizontalTextAlignment="Center"/>
-            <Label Text="Powered by AI-driven categorization"
-                   Style="{StaticResource AccentLabel}"
-                   FontSize="12"
-                   HorizontalTextAlignment="Center"/>
+                   FontSize="36"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,10"/>
+
+            <!-- Tagline -->
+            <Label Text="The premium music curation studio for&#x0a;your Spotify library."
+                   FontSize="15"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="WordWrap"/>
+
         </VerticalStackLayout>
 
-        <!-- Status & Loading -->
-        <VerticalStackLayout Grid.Row="1"
+        <!-- Bottom Section - Login Card -->
+        <Frame Grid.Row="1"
+               Style="{StaticResource GlassCard}"
+               CornerRadius="20"
+               Padding="32,28"
+               Margin="32,0,32,40"
+               VerticalOptions="End">
+
+            <VerticalStackLayout Spacing="16">
+                <!-- Welcome Back -->
+                <Label Text="Welcome Back"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center"/>
+
+                <!-- Description -->
+                <Label Text="Organize, de-duplicate, and master your&#x0a;collection in seconds."
+                       FontSize="14"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap"/>
+
+                <!-- Connect Button -->
+                <Button Text="Connect with Spotify"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding LoginCommand}"
+                        Margin="0,8,0,0"/>
+
+                <!-- Studio Label -->
+                <Label Text="STUDIO-GRADE LIBRARY TOOLS"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource TextMuted}"
+                       HorizontalTextAlignment="Center"/>
+
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Loading overlay -->
+        <VerticalStackLayout Grid.Row="0"
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
-                             Spacing="12">
+                             IsVisible="{Binding IsLoading}">
             <ActivityIndicator IsRunning="{Binding IsLoading}"
-                               IsVisible="{Binding IsLoading}"
                                Style="{StaticResource GoldActivityIndicator}"/>
             <Label Text="{Binding StatusMessage}"
-                   Style="{StaticResource BodyLabel}"
+                   Style="{StaticResource SubtitleLabel}"
                    HorizontalTextAlignment="Center"
-                   IsVisible="{Binding StatusMessage, Converter={StaticResource IsNotNullConverter}}"/>
+                   Margin="0,12,0,0"/>
         </VerticalStackLayout>
 
-        <!-- Login Button -->
-        <Button Grid.Row="2"
-                Text="Connect with Spotify"
-                Style="{StaticResource PrimaryButton}"
-                Command="{Binding LoginCommand}"
-                Margin="0,0,0,40"/>
+        <!-- Terms footer -->
+        <Label Grid.Row="1"
+               Text="By connecting, you agree to Tunelith's Terms of Service."
+               FontSize="11"
+               TextColor="{StaticResource TextMuted}"
+               HorizontalTextAlignment="Center"
+               Margin="0,0,0,12"
+               VerticalOptions="End"/>
 
     </Grid>
 

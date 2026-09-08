@@ -8,7 +8,8 @@
     Title="Tunelith"
     Shell.BackgroundColor="{StaticResource BackgroundColor}"
     Shell.ForegroundColor="{StaticResource PrimaryGold}"
-    Shell.TitleColor="{StaticResource TextPrimary}">
+    Shell.TitleColor="{StaticResource TextPrimary}"
+    Shell.NavBarIsVisible="False">
 
     <ShellContent
         Title="Login"
@@ -21,13 +22,23 @@
         Route="LibraryPage" />
 
     <ShellContent
-        Title="Categorize"
-        ContentTemplate="{DataTemplate views:CategorizationPage}"
-        Route="CategorizationPage" />
+        Title="Analyzing"
+        ContentTemplate="{DataTemplate views:AnalyzingStudioPage}"
+        Route="AnalyzingStudioPage" />
 
     <ShellContent
         Title="Report"
         ContentTemplate="{DataTemplate views:ChangeReportPage}"
         Route="ChangeReportPage" />
+
+    <ShellContent
+        Title="Duplicates"
+        ContentTemplate="{DataTemplate views:DuplicateCleanupPage}"
+        Route="DuplicateCleanupPage" />
+
+    <ShellContent
+        Title="Mastered"
+        ContentTemplate="{DataTemplate views:LibraryMasteredPage}"
+        Route="LibraryMasteredPage" />
 
 </Shell>

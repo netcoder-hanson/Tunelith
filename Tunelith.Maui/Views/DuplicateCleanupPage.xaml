@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
+             x:Class="Tunelith.Maui.Views.DuplicateCleanupPage"
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="24,24,24,0" ColumnDefinitions="Auto,*,Auto">
+            <Frame Grid.Column="0"
+                   BackgroundColor="{StaticResource SurfaceColor}"
+                   BorderColor="{StaticResource CardBorder}"
+                   CornerRadius="12"
+                   Padding="10"
+                   HeightRequest="44" WidthRequest="44"
+                   VerticalOptions="Center">
+                <Label Text="◀"
+                       FontSize="14"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+
+            <VerticalStackLayout Grid.Column="1"
+                                 VerticalOptions="Center"
+                                 Margin="12,0,0,0">
+                <Label Text="Duplicate Cleanup"
+                       FontSize="22"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"/>
+                <Label Text="{Binding StatusMessage}"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.2"
+                       TextColor="{StaticResource SecondaryCyan}"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Duplicate Track List -->
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding DuplicateItems}"
+                        SelectionMode="None"
+                        Margin="24,16,24,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="16,14"
+                          ColumnDefinitions="Auto,*,Auto,Auto"
+                          Margin="0,0,0,8"
+                          BackgroundColor="{StaticResource SurfaceColor}">
+                        <!-- Album art placeholder -->
+                        <Frame Grid.Column="0"
+                               BackgroundColor="{StaticResource SurfaceLight}"
+                               CornerRadius="8"
+                               Padding="0"
+                               HeightRequest="48" WidthRequest="48"
+                               HasShadow="False"
+                               BorderColor="Transparent">
+                            <Label Text="🎵"
+                                   FontSize="18"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Frame>
+
+                        <!-- Track info -->
+                        <VerticalStackLayout Grid.Column="1"
+                                             VerticalOptions="Center"
+                                             Margin="12,0,0,0">
+                            <Label Text="{Binding DisplayName}"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="{Binding ArtistAlbum}"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   MaxLines="1"/>
+                        </VerticalStackLayout>
+
+                        <!-- Status text -->
+                        <Label Grid.Column="2"
+                               VerticalOptions="Center"
+                               Margin="8,0"
+                               FontSize="10"
+                               FontAttributes="Bold"
+                               CharacterSpacing="1">
+                            <Label.Text>
+                                <Binding Path="IsDuplicate" Converter="{StaticResource BoolToStringConverter}"
+                                         ConverterParameter="DUPLICATE|EXCLUDED"/>
+                            </Label.Text>
+                            <Label.TextColor>
+                                <Binding Path="IsDuplicate" Converter="{StaticResource BoolToColorConverter}"
+                                         ConverterParameter="#00E5FF|#555566"/>
+                            </Label.TextColor>
+                        </Label>
+
+                        <!-- Toggle switch -->
+                        <Switch Grid.Column="3"
+                                IsToggled="{Binding IsDuplicate}"
+                                OnColor="{StaticResource PrimaryGold}"
+                                ThumbColor="{StaticResource TextPrimary}"
+                                VerticalOptions="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Button -->
+        <Button Grid.Row="2"
+                Text="Confirm Selection"
+                Style="{StaticResource PrimaryButton}"
+                Command="{Binding ConfirmSelectionCommand}"
+                Margin="24,0,24,32"/>
+
+    </Grid>
+
+</ContentPage>

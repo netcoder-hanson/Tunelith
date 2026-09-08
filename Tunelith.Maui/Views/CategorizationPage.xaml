@@ -3,58 +3,71 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
              x:Class="Tunelith.Maui.Views.CategorizationPage"
-             Style="{StaticResource PageStyle}">
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
 
-    <!-- BindingContext set in code-behind via DI -->
-
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="0">
 
         <!-- Header -->
-        <Label Grid.Row="0"
-               Text="Organize Library"
-               Style="{StaticResource TitleLabel}"
-               Margin="0,0,0,8"/>
-        <Label Grid.Row="0"
-               Text="AI-powered categorization"
-               Style="{StaticResource SubtitleLabel}"
-               Margin="0,40,0,0"/>
+        <Grid Grid.Row="0" Padding="24,24,24,0">
+            <VerticalStackLayout>
+                <Label Text="Organize Library"
+                       FontSize="26"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"/>
+                <Label Text="AI-POWERED CATEGORIZATION"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource TextSecondary}"
+                       Margin="0,2,0,0"/>
+            </VerticalStackLayout>
+        </Grid>
 
         <!-- Progress -->
-        <VerticalStackLayout Grid.Row="1" Margin="0,12,0,16">
+        <VerticalStackLayout Grid.Row="1" Padding="24,16,24,0">
             <ProgressBar Progress="{Binding ProgressPercent, Converter={StaticResource PercentToDoubleConverter}}"
                          ProgressColor="{StaticResource PrimaryGold}"
                          HeightRequest="4"/>
             <Label Text="{Binding StatusMessage}"
-                   Style="{StaticResource BodyLabel}"
+                   Style="{StaticResource BodySecondaryLabel}"
                    FontSize="12"
                    Margin="0,8,0,0"/>
         </VerticalStackLayout>
 
         <!-- Categories & Duplicates -->
-        <ScrollView Grid.Row="2">
+        <ScrollView Grid.Row="2" Padding="24,16,24,0">
             <VerticalStackLayout Spacing="12">
 
-                <!-- Categories -->
-                <Label Text="Categories Found"
-                       Style="{StaticResource AccentLabel}"
+                <Label Text="CATEGORIES FOUND"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource SecondaryCyan}"
                        IsVisible="{Binding Categories.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
 
                 <CollectionView ItemsSource="{Binding Categories}"
-                                SelectionMode="None"
-                                HeightRequest="{Binding Categories.Count, Converter={StaticResource CategoriesHeightConverter}}">
+                                SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
+                            <Frame Style="{StaticResource GlassCard}" Padding="16,14" Margin="0,0,0,8">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                        <Label Text="{Binding Name}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
-                                        <Label Text="{Binding Description}" Style="{StaticResource SubtitleLabel}" FontSize="11"/>
+                                        <Label Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"/>
+                                        <Label Text="{Binding Description}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondary}"/>
                                     </VerticalStackLayout>
                                     <Frame Grid.Column="1"
                                            Style="{StaticResource CategoryTag}"
                                            VerticalOptions="Center">
                                         <Label Text="{Binding TrackIds.Count, StringFormat='{0} tracks'}"
-                                               Style="{StaticResource AccentLabel}" FontSize="11"/>
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource SecondaryCyan}"/>
                                     </Frame>
                                 </Grid>
                             </Frame>
@@ -62,23 +75,30 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
-                <!-- Duplicates -->
-                <Label Text="Duplicates Found"
-                       Style="{StaticResource AccentLabel}"
+                <Label Text="DUPLICATES FOUND"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource SecondaryCyan}"
                        Margin="0,8,0,0"
                        IsVisible="{Binding Duplicates.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
 
                 <CollectionView ItemsSource="{Binding Duplicates}"
-                                SelectionMode="None"
-                                HeightRequest="{Binding Duplicates.Count, Converter={StaticResource DuplicatesHeightConverter}}">
+                                SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
+                            <Frame Style="{StaticResource GlassCard}" Padding="16,14" Margin="0,0,0,8">
                                 <VerticalStackLayout Spacing="4">
-                                    <Label Text="{Binding Tracks[0].DisplayName}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Tracks[1].DisplayName}" Style="{StaticResource BodyLabel}"/>
+                                    <Label Text="{Binding Tracks[0].Name}"
+                                           FontSize="15"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"/>
+                                    <Label Text="{Binding Tracks[1].Name}"
+                                           FontSize="14"
+                                           TextColor="{StaticResource TextPrimary}"/>
                                     <Label Text="{Binding Type, StringFormat='Type: {0}'}"
-                                           Style="{StaticResource SubtitleLabel}" FontSize="11"/>
+                                           FontSize="12"
+                                           TextColor="{StaticResource TextSecondary}"/>
                                 </VerticalStackLayout>
                             </Frame>
                         </DataTemplate>
@@ -89,7 +109,7 @@
         </ScrollView>
 
         <!-- Bottom -->
-        <VerticalStackLayout Grid.Row="3" Spacing="8" Margin="0,12,0,0">
+        <VerticalStackLayout Grid.Row="3" Padding="24,12,24,24" Spacing="8">
             <ActivityIndicator IsRunning="{Binding IsProcessing}"
                                IsVisible="{Binding IsProcessing}"
                                Style="{StaticResource GoldActivityIndicator}"/>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
+             x:Class="Tunelith.Maui.Views.AnalyzingStudioPage"
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto" Padding="0">
+
+        <!-- Center Content -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="0">
+
+            <!-- Circular Progress Ring -->
+            <Grid WidthRequest="180" HeightRequest="180"
+                  HorizontalOptions="Center" Margin="0,0,0,24">
+                <Ellipse Stroke="{StaticResource PrimaryGold}"
+                         StrokeThickness="2"
+                         Fill="Transparent"
+                         Opacity="0.3"/>
+                <Ellipse Stroke="{StaticResource CardBorder}"
+                         StrokeThickness="4"
+                         Fill="Transparent"/>
+                <VerticalStackLayout VerticalOptions="Center"
+                                     HorizontalOptions="Center"
+                                     Spacing="4">
+                    <Grid WidthRequest="80" HeightRequest="80"
+                          HorizontalOptions="Center">
+                        <Ellipse Fill="{StaticResource SurfaceColor}"
+                                 Stroke="{StaticResource PrimaryGold}"
+                                 StrokeThickness="2"/>
+                        <Label Text="🎧"
+                               FontSize="32"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                    <Label Text="{Binding ProgressPercent, StringFormat='{0}%'}"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="Analyzing Studio"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,8"/>
+
+            <Label Text="{Binding TotalTracks, StringFormat='Analyzing {0} tracks...'}"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,4"/>
+
+            <Label Text="{Binding CurrentStep}"
+                   FontSize="14"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center"/>
+
+        </VerticalStackLayout>
+
+        <!-- Live Analysis Card -->
+        <Frame Grid.Row="1"
+               Style="{StaticResource GlassCard}"
+               CornerRadius="16"
+               Padding="20"
+               Margin="20,0,20,24">
+
+            <VerticalStackLayout Spacing="12">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Ellipse Grid.Column="0"
+                             WidthRequest="8" HeightRequest="8"
+                             Fill="{StaticResource SecondaryCyan}"
+                             VerticalOptions="Center" Margin="0,0,8,0"/>
+                    <Label Grid.Column="1"
+                           Text="LIVE ANALYSIS"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           CharacterSpacing="1.5"
+                           TextColor="{StaticResource SecondaryCyan}"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="Fetching Playlists"
+                           FontSize="14"
+                           TextColor="{StaticResource TextPrimary}"
+                           VerticalOptions="Center"/>
+                    <Label Grid.Column="1"
+                           Text="✓"
+                           FontSize="16"
+                           TextColor="{StaticResource SuccessGreen}"
+                           IsVisible="{Binding Step1Complete}"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="Mapping Audio Features"
+                           FontSize="14"
+                           TextColor="{StaticResource TextPrimary}"
+                           VerticalOptions="Center"/>
+                    <Label Grid.Column="1"
+                           Text="✓"
+                           FontSize="16"
+                           TextColor="{StaticResource SuccessGreen}"
+                           IsVisible="{Binding Step2Complete}"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="Matching Duplicates"
+                           FontSize="14"
+                           TextColor="{StaticResource TextPrimary}"
+                           VerticalOptions="Center"/>
+                    <ActivityIndicator Grid.Column="1"
+                                       IsRunning="{Binding Step3Active}"
+                                       IsVisible="{Binding Step3Active}"
+                                       Color="{StaticResource PrimaryGold}"
+                                       HeightRequest="16" WidthRequest="16"/>
+                    <Label Grid.Column="1"
+                           Text="✓"
+                           FontSize="16"
+                           TextColor="{StaticResource SuccessGreen}"
+                           IsVisible="{Binding Step3Complete}"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0"
+                           Text="Re-sorting Genres"
+                           FontSize="14"
+                           TextColor="{StaticResource TextMuted}"
+                           VerticalOptions="Center"/>
+                    <ActivityIndicator Grid.Column="1"
+                                       IsRunning="{Binding Step4Pending}"
+                                       IsVisible="{Binding Step4Pending}"
+                                       Color="{StaticResource TextMuted}"
+                                       HeightRequest="16" WidthRequest="16"/>
+                </Grid>
+            </VerticalStackLayout>
+        </Frame>
+
+    </Grid>
+
+</ContentPage>

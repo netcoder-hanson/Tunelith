@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
+             x:Class="Tunelith.Maui.Views.LibraryMasteredPage"
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="*,Auto" Padding="0">
+
+        <!-- Center Content -->
+        <VerticalStackLayout Grid.Row="0"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="0"
+                             Padding="32">
+
+            <!-- Success Icon -->
+            <Grid WidthRequest="140" HeightRequest="140"
+                  HorizontalOptions="Center" Margin="0,0,0,24">
+                <Ellipse Fill="{StaticResource SurfaceColor}"
+                         Stroke="{StaticResource PrimaryGold}"
+                         StrokeThickness="2"/>
+                <Label Text="🔒"
+                       FontSize="40"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Grid>
+
+            <!-- Title -->
+            <Label Text="Library Mastered"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,12"/>
+
+            <!-- Subtitle -->
+            <Label Text="Your Spotify library has been&#x0a;professionally curated and&#x0a;synchronized."
+                   FontSize="15"
+                   TextColor="{StaticResource TextSecondary}"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,32"/>
+
+            <!-- Stats Card -->
+            <Frame Style="{StaticResource GlassCard}"
+                   WidthRequest="300"
+                   Padding="24,20"
+                   HorizontalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Duplicates Removed"
+                               FontSize="14"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding DuplicatesRemoved}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             Color="{StaticResource CardBorder}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="New Playlists"
+                               FontSize="14"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding NewPlaylists}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+
+                    <BoxView HeightRequest="1"
+                             Color="{StaticResource CardBorder}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Tracks Re-sorted"
+                               FontSize="14"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TracksResorted}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Buttons -->
+        <VerticalStackLayout Grid.Row="1"
+                             Spacing="12"
+                             Padding="32,0,32,32">
+            <Button Text="Return to Dashboard"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding ReturnToDashboardCommand}"/>
+            <Button Text="SHARE MY STATS"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ShareStatsCommand}"
+                    HeightRequest="48"/>
+        </VerticalStackLayout>
+
+    </Grid>
+
+</ContentPage>

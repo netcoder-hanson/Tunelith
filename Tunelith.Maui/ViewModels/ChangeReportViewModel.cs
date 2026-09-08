@@ -45,12 +45,14 @@ public class ChangeReportViewModel : ViewModelBase
     }
 
     public AsyncRelayCommand ApplyChangesCommand { get; }
+    public AsyncRelayCommand ReviewSelectiveCommand { get; }
 
     public ChangeReportViewModel(ISpotifyApiClient spotifyClient, TunelithDbContext dbContext)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
         ApplyChangesCommand = new AsyncRelayCommand(ApplyChangesAsync);
+        ReviewSelectiveCommand = new AsyncRelayCommand(ReviewSelectiveAsync);
     }
 
     public void LoadReport(CategorizationResult categorizationResult, List<DuplicateGroup> duplicates)
@@ -101,17 +103,9 @@ public class ChangeReportViewModel : ViewModelBase
                 }
             }
 
-            StatusMessage = "Removing duplicates...";
-            foreach (var duplicate in Report.DuplicatesToRemove)
-            {
-                if (duplicate.Tracks.Count > 1)
-                {
-                    var tracksToRemove = duplicate.Tracks.Skip(1).Select(t => t.Id);
-                    await _dbContext.GetCachedTracksAsync();
-                }
-            }
-
             StatusMessage = "Changes applied successfully!";
+
+            await Shell.Current.GoToAsync("LibraryMasteredPage");
         }
         catch (Exception ex)
         {
@@ -121,5 +115,10 @@ public class ChangeReportViewModel : ViewModelBase
         {
             IsApplying = false;
         }
+    }
+
+    private async Task ReviewSelectiveAsync()
+    {
+        await Shell.Current.GoToAsync("DuplicateCleanupPage");
     }
 }

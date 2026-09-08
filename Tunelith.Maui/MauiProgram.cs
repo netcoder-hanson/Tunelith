@@ -36,11 +36,17 @@ public static class MauiProgram
 		builder.Services.AddTransient<LibraryViewModel>();
 		builder.Services.AddTransient<CategorizationViewModel>();
 		builder.Services.AddTransient<ChangeReportViewModel>();
+		builder.Services.AddTransient<AnalyzingStudioViewModel>();
+		builder.Services.AddTransient<DuplicateCleanupViewModel>();
+		builder.Services.AddTransient<LibraryMasteredViewModel>();
 
 		builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<LibraryPage>();
 		builder.Services.AddTransient<CategorizationPage>();
 		builder.Services.AddTransient<ChangeReportPage>();
+		builder.Services.AddTransient<AnalyzingStudioPage>();
+		builder.Services.AddTransient<DuplicateCleanupPage>();
+		builder.Services.AddTransient<LibraryMasteredPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

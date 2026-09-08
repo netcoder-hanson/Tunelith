@@ -3,87 +3,167 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
              x:Class="Tunelith.Maui.Views.LibraryPage"
-             Style="{StaticResource PageStyle}">
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
 
-    <!-- BindingContext set in code-behind via DI -->
-
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="0">
 
         <!-- Header -->
-        <Label Grid.Row="0"
-               Text="Your Library"
-               Style="{StaticResource TitleLabel}"
-               Margin="0,0,0,16"/>
+        <Grid Grid.Row="0" Padding="24,24,24,0" ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Grid.Column="0">
+                <Label Text="Your Library"
+                       FontSize="26"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"/>
+                <Label Text="READY FOR SCAN"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource TextSecondary}"
+                       Margin="0,2,0,0"/>
+            </VerticalStackLayout>
 
-        <!-- Stats Cards -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,0,0,16">
-            <Frame Grid.Column="0" Style="{StaticResource GlassPanel}" Padding="12">
+            <!-- User avatar placeholder -->
+            <Frame Grid.Column="1"
+                   BackgroundColor="{StaticResource SurfaceColor}"
+                   BorderColor="{StaticResource CardBorder}"
+                   CornerRadius="20"
+                   Padding="0"
+                   HeightRequest="40" WidthRequest="40"
+                   HasShadow="False">
+                <Label Text="👤"
+                       FontSize="16"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Frame>
+        </Grid>
+
+        <!-- Stats Row -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,12,*" Padding="24,16,24,0">
+            <!-- Tracks -->
+            <Frame Grid.Column="0"
+                   Style="{StaticResource StatCard}">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="{Binding LikedSongsCount}" Style="{StaticResource TitleLabel}" FontSize="24"/>
-                    <Label Text="Liked Songs" Style="{StaticResource SubtitleLabel}" FontSize="12"/>
+                    <Label Text="TRACKS"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           CharacterSpacing="1.2"
+                           TextColor="{StaticResource TextSecondary}"/>
+                    <Label Text="{Binding LikedSongsCount}"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
                 </VerticalStackLayout>
             </Frame>
-            <Frame Grid.Column="1" Style="{StaticResource GlassPanel}" Padding="12">
+
+            <!-- Playlists -->
+            <Frame Grid.Column="2"
+                   Style="{StaticResource StatCard}">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="{Binding PlaylistsCount}" Style="{StaticResource TitleLabel}" FontSize="24"/>
-                    <Label Text="Playlists" Style="{StaticResource SubtitleLabel}" FontSize="12"/>
-                </VerticalStackLayout>
-            </Frame>
-            <Frame Grid.Column="2" Style="{StaticResource GlassPanel}" Padding="12">
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="{Binding TotalTracks}" Style="{StaticResource TitleLabel}" FontSize="24"/>
-                    <Label Text="Total Tracks" Style="{StaticResource SubtitleLabel}" FontSize="12"/>
+                    <Label Text="PLAYLISTS"
+                           FontSize="11"
+                           FontAttributes="Bold"
+                           CharacterSpacing="1.2"
+                           TextColor="{StaticResource TextSecondary}"/>
+                    <Label Text="{Binding PlaylistsCount}"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
                 </VerticalStackLayout>
             </Frame>
         </Grid>
 
-        <!-- Playlist List -->
-        <CollectionView Grid.Row="2"
-                        ItemsSource="{Binding Playlists}"
-                        SelectionMode="None">
-            <CollectionView.EmptyView>
-                <VerticalStackLayout VerticalOptions="Center"
-                                     HorizontalOptions="Center"
-                                     Spacing="12">
-                    <Label Text="No playlists loaded"
-                           Style="{StaticResource SubtitleLabel}"
-                           HorizontalTextAlignment="Center"/>
-                    <Button Text="Scan Library"
-                            Style="{StaticResource PrimaryButton}"
-                            Command="{Binding ScanLibraryCommand}"
-                            WidthRequest="200"/>
+        <!-- Potential Duplicates -->
+        <Frame Grid.Row="2"
+               Style="{StaticResource StatCard}"
+               Padding="20,16"
+               Margin="24,12,24,0"
+               IsVisible="{Binding TotalTracks, Converter={StaticResource IsGreaterThanZeroConverter}}">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Text="Potential Duplicates"
+                           FontSize="15"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"/>
+                    <Label Text="Estimated 34 tracks across your library."
+                           FontSize="12"
+                           TextColor="{StaticResource TextSecondary}"/>
                 </VerticalStackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Style="{StaticResource GlassPanel}" Padding="16" Margin="0,4">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="{Binding Name}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
-                                <Label Text="{Binding TotalTracks, StringFormat='{0} tracks'}"
-                                       Style="{StaticResource SubtitleLabel}" FontSize="12"/>
-                            </VerticalStackLayout>
-                        </Grid>
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
 
-        <!-- Bottom Actions -->
-        <VerticalStackLayout Grid.Row="3" Spacing="8" Margin="0,12,0,0">
+                <Frame Grid.Column="1"
+                       BackgroundColor="{StaticResource SecondaryCyan}"
+                       CornerRadius="8"
+                       Padding="10,5"
+                       HasShadow="False"
+                       BorderColor="Transparent"
+                       VerticalOptions="Center">
+                    <Label Text="34 FOUND"
+                           FontSize="10"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource BackgroundColor}"/>
+                </Frame>
+            </Grid>
+        </Frame>
+
+        <!-- Studio Intelligence Card -->
+        <Frame Grid.Row="3"
+               Style="{StaticResource GlassCard}"
+               Margin="24,16,24,0"
+               VerticalOptions="Center">
+            <VerticalStackLayout Spacing="12">
+                <!-- Icon -->
+                <Grid WidthRequest="60" HeightRequest="60"
+                      HorizontalOptions="Center">
+                    <Frame BackgroundColor="{StaticResource SurfaceLight}"
+                           BorderColor="{StaticResource CardBorder}"
+                           CornerRadius="14"
+                           Padding="0"
+                           HasShadow="False">
+                        <Label Text="🧠"
+                               FontSize="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Frame>
+                </Grid>
+
+                <Label Text="Studio Intelligence"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center"/>
+
+                <Label Text="Ready to analyze your library and&#x0a;suggest duplicate cleanup and&#x0a;genre-based organization."
+                       FontSize="14"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap"/>
+
+                <Button Text="Scan My Library"
+                        Style="{StaticResource PrimaryButton}"
+                        Command="{Binding ScanLibraryCommand}"
+                        Margin="0,8,0,0"/>
+
+                <Label Text="APPROX. 45 SECONDS"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.2"
+                       TextColor="{StaticResource TextMuted}"
+                       HorizontalTextAlignment="Center"/>
+
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Loading & Status -->
+        <VerticalStackLayout Grid.Row="4"
+                             Padding="24,0,24,24"
+                             Spacing="8">
             <ActivityIndicator IsRunning="{Binding IsLoading}"
                                IsVisible="{Binding IsLoading}"
                                Style="{StaticResource GoldActivityIndicator}"/>
             <Label Text="{Binding StatusMessage}"
-                   Style="{StaticResource BodyLabel}"
+                   Style="{StaticResource BodySecondaryLabel}"
                    FontSize="12"
                    HorizontalTextAlignment="Center"/>
-            <Button Text="Scan Library"
-                    Style="{StaticResource PrimaryButton}"
-                    Command="{Binding ScanLibraryCommand}"/>
-            <Button Text="Organize Library"
-                    Style="{StaticResource SecondaryButton}"
-                    Command="{Binding StartCategorizationCommand}"/>
         </VerticalStackLayout>
 
     </Grid>

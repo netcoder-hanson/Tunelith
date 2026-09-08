@@ -3,95 +3,204 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:Tunelith.Maui.ViewModels"
              x:Class="Tunelith.Maui.Views.ChangeReportPage"
-             Style="{StaticResource PageStyle}">
+             Style="{StaticResource PageStyle}"
+             Shell.NavBarIsVisible="False">
 
-    <!-- BindingContext set in code-behind via DI -->
-
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="0">
 
         <!-- Header -->
-        <Label Grid.Row="0"
-               Text="Change Report"
-               Style="{StaticResource TitleLabel}"
-               Margin="0,0,0,4"/>
-        <Label Grid.Row="0"
-               Text="Review before applying"
-               Style="{StaticResource SubtitleLabel}"
-               Margin="0,38,0,0"/>
-
-        <!-- Summary Stats -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" Margin="0,12,0,16">
-            <Frame Grid.Column="0" Style="{StaticResource GlassPanel}" Padding="10">
-                <VerticalStackLayout Spacing="2">
-                    <Label Text="{Binding Report.PlaylistsToCreate.Count}"
-                           Style="{StaticResource TitleLabel}" FontSize="20" HorizontalTextAlignment="Center"/>
-                    <Label Text="Playlists" Style="{StaticResource SubtitleLabel}" FontSize="11" HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-            </Frame>
-            <Frame Grid.Column="1" Style="{StaticResource GlassPanel}" Padding="10">
-                <VerticalStackLayout Spacing="2">
-                    <Label Text="{Binding Report.TotalTracksResorted}"
-                           Style="{StaticResource TitleLabel}" FontSize="20" HorizontalTextAlignment="Center"/>
-                    <Label Text="Tracks" Style="{StaticResource SubtitleLabel}" FontSize="11" HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-            </Frame>
-            <Frame Grid.Column="2" Style="{StaticResource GlassPanel}" Padding="10">
-                <VerticalStackLayout Spacing="2">
-                    <Label Text="{Binding Report.DuplicatesToRemove.Count}"
-                           Style="{StaticResource TitleLabel}" FontSize="20" HorizontalTextAlignment="Center"/>
-                    <Label Text="Duplicates" Style="{StaticResource SubtitleLabel}" FontSize="11" HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-            </Frame>
+        <Grid Grid.Row="0" Padding="24,24,24,0">
+            <VerticalStackLayout>
+                <Label Text="Studio Report"
+                       FontSize="26"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"/>
+                <Label Text="OPTIMIZATION DRAFT"
+                       FontSize="11"
+                       FontAttributes="Bold"
+                       CharacterSpacing="1.5"
+                       TextColor="{StaticResource TextSecondary}"
+                       Margin="0,2,0,0"/>
+            </VerticalStackLayout>
         </Grid>
 
-        <!-- Details -->
-        <ScrollView Grid.Row="2">
-            <VerticalStackLayout Spacing="12">
+        <!-- Analysis Complete Card -->
+        <Frame Grid.Row="1"
+               Style="{StaticResource GlassCard}"
+               Padding="24,24,24,20"
+               Margin="24,16,24,0">
+            <VerticalStackLayout Spacing="8">
+                <!-- Icon -->
+                <Grid WidthRequest="48" HeightRequest="48"
+                      HorizontalOptions="Center">
+                    <Frame BackgroundColor="{StaticResource SecondaryCyan}"
+                           CornerRadius="12"
+                           Padding="0"
+                           HasShadow="False"
+                           BorderColor="Transparent">
+                        <Label Text="📋"
+                               FontSize="20"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Frame>
+                </Grid>
 
-                <!-- Playlists to Create -->
-                <Label Text="Playlists to Create"
-                       Style="{StaticResource AccentLabel}"
-                       IsVisible="{Binding Report.PlaylistsToCreate.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
+                <Label Text="Analysis Complete"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center"/>
 
+                <Label Text="We found several ways to optimize your library."
+                       FontSize="13"
+                       TextColor="{StaticResource TextSecondary}"
+                       HorizontalTextAlignment="Center"
+                       Margin="0,0,0,8"/>
+
+                <!-- Summary stats row -->
+                <Grid ColumnDefinitions="*,*">
+                    <Frame Grid.Column="0"
+                           BackgroundColor="{StaticResource SurfaceLight}"
+                           CornerRadius="10"
+                           Padding="14,12"
+                           HasShadow="False"
+                           BorderColor="Transparent">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="DUPLICATES"
+                                   FontSize="10"
+                                   FontAttributes="Bold"
+                                   CharacterSpacing="1"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding Report.DuplicatesToRemove.Count, StringFormat='{0} Tracks'}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource SecondaryCyan}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+
+                    <Frame Grid.Column="1"
+                           BackgroundColor="{StaticResource SurfaceLight}"
+                           CornerRadius="10"
+                           Padding="14,12"
+                           HasShadow="False"
+                           BorderColor="Transparent">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="NEW PLAYLISTS"
+                                   FontSize="10"
+                                   FontAttributes="Bold"
+                                   CharacterSpacing="1"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Text="{Binding Report.PlaylistsToCreate.Count, StringFormat='{0} Created'}"
+                                   FontSize="18"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource SecondaryCyan}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Proposed Changes Header -->
+        <Label Grid.Row="2"
+               Text="PROPOSED CHANGES"
+               FontSize="11"
+               FontAttributes="Bold"
+               CharacterSpacing="1.5"
+               TextColor="{StaticResource TextSecondary}"
+               Padding="24,20,24,8"/>
+
+        <!-- Proposed Changes List -->
+        <ScrollView Grid.Row="3">
+            <VerticalStackLayout Spacing="8" Padding="24,0,24,0">
+
+                <!-- Duplicate Cleanup -->
+                <Frame Style="{StaticResource GlassCard}" Padding="16,14">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                        <Frame Grid.Column="0"
+                               BackgroundColor="{StaticResource SurfaceLight}"
+                               CornerRadius="10"
+                               Padding="8"
+                               HasShadow="False"
+                               BorderColor="Transparent"
+                               HeightRequest="40" WidthRequest="40">
+                            <Label Text="🔄"
+                                   FontSize="16"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Frame>
+
+                        <VerticalStackLayout Grid.Column="1"
+                                             VerticalOptions="Center"
+                                             Margin="12,0,0,0">
+                            <Label Text="Duplicate Cleanup"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Text="Remove exact &amp; near-matches"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                        </VerticalStackLayout>
+
+                        <Label Grid.Column="2"
+                               Text="{Binding Report.DuplicatesToRemove.Count}"
+                               FontSize="15"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalOptions="Center"
+                               Margin="8,0"/>
+
+                        <Label Grid.Column="3"
+                               Text="›"
+                               FontSize="20"
+                               TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center"/>
+                    </Grid>
+                </Frame>
+
+                <!-- Category items from Report -->
                 <CollectionView ItemsSource="{Binding Report.PlaylistsToCreate}"
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                        <Label Text="{Binding Name}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
-                                        <Label Text="{Binding TrackIds.Count, StringFormat='{0} tracks to add'}"
-                                               Style="{StaticResource SubtitleLabel}" FontSize="11"/>
-                                    </VerticalStackLayout>
-                                    <Frame Grid.Column="1"
-                                           BackgroundColor="{StaticResource SuccessGreen}"
-                                           CornerRadius="8"
-                                           Padding="8,4"
-                                           VerticalOptions="Center">
-                                        <Label Text="NEW" TextColor="{StaticResource BackgroundColor}" FontSize="10" FontAttributes="Bold"/>
+                            <Frame Style="{StaticResource GlassCard}" Padding="16,14" Margin="0">
+                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                    <Frame Grid.Column="0"
+                                           BackgroundColor="{StaticResource SurfaceLight}"
+                                           CornerRadius="10"
+                                           Padding="8"
+                                           HasShadow="False"
+                                           BorderColor="Transparent"
+                                           HeightRequest="40" WidthRequest="40">
+                                        <Label Text="🎵"
+                                               FontSize="16"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
                                     </Frame>
+
+                                    <VerticalStackLayout Grid.Column="1"
+                                                         VerticalOptions="Center"
+                                                         Margin="12,0,0,0">
+                                        <Label Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"/>
+                                        <Label Text="New smart playlist proposal"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondary}"/>
+                                    </VerticalStackLayout>
+
+                                    <Label Grid.Column="2"
+                                           Text="{Binding TrackIds.Count}"
+                                           FontSize="15"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           VerticalOptions="Center"
+                                           Margin="8,0"/>
+
+                                    <Label Grid.Column="3"
+                                           Text="›"
+                                           FontSize="20"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           VerticalOptions="Center"/>
                                 </Grid>
-                            </Frame>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-                <!-- Duplicates -->
-                <Label Text="Duplicates to Remove"
-                       Style="{StaticResource AccentLabel}"
-                       Margin="0,8,0,0"
-                       IsVisible="{Binding Report.DuplicatesToRemove.Count, Converter={StaticResource IsGreaterThanZeroConverter}}"/>
-
-                <CollectionView ItemsSource="{Binding Report.DuplicatesToRemove}"
-                                SelectionMode="None">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Frame Style="{StaticResource GlassPanel}" Padding="14" Margin="0,4">
-                                <VerticalStackLayout Spacing="4">
-                                    <Label Text="{Binding Tracks[0].DisplayName}" Style="{StaticResource BodyLabel}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Tracks[1].DisplayName}" Style="{StaticResource BodyLabel}"/>
-                                </VerticalStackLayout>
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -100,18 +209,24 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Bottom Actions -->
-        <VerticalStackLayout Grid.Row="3" Spacing="8" Margin="0,12,0,0">
+        <!-- Bottom Buttons -->
+        <VerticalStackLayout Grid.Row="4"
+                             Spacing="10"
+                             Padding="24,12,24,24">
             <ActivityIndicator IsRunning="{Binding IsApplying}"
                                IsVisible="{Binding IsApplying}"
                                Style="{StaticResource GoldActivityIndicator}"/>
             <Label Text="{Binding StatusMessage}"
-                   Style="{StaticResource BodyLabel}"
+                   Style="{StaticResource BodySecondaryLabel}"
                    FontSize="12"
-                   HorizontalTextAlignment="Center"/>
-            <Button Text="Apply Changes to Spotify"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="{Binding StatusMessage, Converter={StaticResource IsNotNullConverter}}"/>
+            <Button Text="Approve All Changes"
                     Style="{StaticResource PrimaryButton}"
                     Command="{Binding ApplyChangesCommand}"/>
+            <Button Text="Review Selectively"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ReviewSelectiveCommand}"/>
         </VerticalStackLayout>
 
     </Grid>

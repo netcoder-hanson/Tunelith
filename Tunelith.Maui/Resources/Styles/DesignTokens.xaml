@@ -10,7 +10,7 @@
     <Color x:Key="PrimaryGold">#FFD700</Color>
     <Color x:Key="SecondaryCyan">#00E5FF</Color>
     <Color x:Key="TextPrimary">#FFFFFF</Color>
-    <Color x:Key="TextSecondary">#888899</Color>
+    <Color x:Key="TextSecondary">#C4C4D1</Color>
     <Color x:Key="TextMuted">#555566</Color>
     <Color x:Key="GlassBorderColor">#33FFD700</Color>
     <Color x:Key="GlassBackgroundColor">#1A16162A</Color>

@@ -41,4 +41,9 @@
         ContentTemplate="{DataTemplate views:LibraryMasteredPage}"
         Route="LibraryMasteredPage" />
 
+    <ShellContent
+        Title="History"
+        ContentTemplate="{DataTemplate views:ScanHistoryPage}"
+        Route="ScanHistoryPage" />
+
 </Shell>

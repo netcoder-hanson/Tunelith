@@ -15,6 +15,10 @@ public interface IGeminiService
     Task<List<GeminiDedupeResult>> FuzzyDedupeAsync(
         List<DedupeCandidate> candidates,
         CancellationToken cancellationToken = default);
+
+    Task<List<PlaylistDescriptionResult>> GeneratePlaylistDescriptionsAsync(
+        List<PlaylistDescriptionInput> playlists,
+        CancellationToken cancellationToken = default);
 }
 
 public class GeminiService : IGeminiService
@@ -138,6 +142,48 @@ Respond with JSON only:
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         return result?.Duplicates ?? new List<GeminiDedupeResult>();
+    }
+
+    public async Task<List<PlaylistDescriptionResult>> GeneratePlaylistDescriptionsAsync(
+        List<PlaylistDescriptionInput> playlists,
+        CancellationToken cancellationToken = default)
+    {
+        if (!playlists.Any()) return new List<PlaylistDescriptionResult>();
+
+        var playlistsJson = JsonSerializer.Serialize(playlists, new JsonSerializerOptions { WriteIndented = false });
+
+        var prompt = $@"You are a music curator writing engaging playlist descriptions for a Spotify user's library.
+Given these categories and their sample tracks, write a short, punchy description (1-2 sentences) for each playlist.
+
+PLAYLISTS:
+{playlistsJson}
+
+RULES:
+- Keep descriptions concise (under 160 characters)
+- Make them sound appealing and personal
+- Reference the vibe or mood, not just list genres
+- No generic filler like ""A collection of...""
+
+Respond with JSON only:
+{{
+  ""playlists"": [
+    {{
+      ""name"": ""Playlist Name"",
+      ""description"": ""Your description here""
+    }}
+  ]
+}}";
+
+        var responseText = await CallGeminiAsync(prompt, cancellationToken);
+
+        var result = JsonSerializer.Deserialize<GeminiPlaylistDescriptionResponse>(responseText,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        return result?.Playlists ?? playlists.Select(p => new PlaylistDescriptionResult
+        {
+            Name = p.Name,
+            Description = $"Tracks curated for {p.Name}"
+        }).ToList();
     }
 
     private async Task<string> CallGeminiAsync(string prompt, CancellationToken cancellationToken)

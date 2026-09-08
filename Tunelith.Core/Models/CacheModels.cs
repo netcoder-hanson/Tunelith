@@ -42,3 +42,22 @@ public class CachedCategory
     public string? Description { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
+
+public class CachedScanHistory
+{
+    public int Id { get; set; }
+    public DateTime ScannedAt { get; set; } = DateTime.UtcNow;
+    public int TotalTracks { get; set; }
+    public int LikedSongsCount { get; set; }
+    public int PlaylistsCount { get; set; }
+    public int DuplicatesFound { get; set; }
+    public int CategoriesCreated { get; set; }
+    public int HealthScore { get; set; }
+}
+
+public class CachedUserPreference
+{
+    public int Id { get; set; }
+    public string Key { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+}

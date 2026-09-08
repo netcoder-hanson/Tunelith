@@ -15,6 +15,7 @@ public class ScanSession
     public int DuplicatesRemoved { get; set; }
     public int NewPlaylists { get; set; }
     public int TracksResorted { get; set; }
+    public int HealthScore { get; set; }
 
     public void Clear()
     {
@@ -24,5 +25,6 @@ public class ScanSession
         DuplicatesRemoved = 0;
         NewPlaylists = 0;
         TracksResorted = 0;
+        HealthScore = 0;
     }
 }

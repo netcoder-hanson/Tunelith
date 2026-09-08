@@ -6,7 +6,7 @@
              Style="{StaticResource PageStyle}"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="0">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Padding="0">
 
         <!-- Header -->
         <Grid Grid.Row="0" Padding="24,24,24,0" ColumnDefinitions="*,Auto">
@@ -76,48 +76,76 @@
             </Frame>
         </Grid>
 
-        <!-- Potential Duplicates (hidden until analysis exists) -->
+        <!-- Scan Reminder Banner -->
         <Frame Grid.Row="2"
-               Style="{StaticResource StatCard}"
-               Padding="20,16"
-               Margin="24,12,24,0"
-               IsVisible="{Binding HasAnalysis}">
-            <Grid ColumnDefinitions="*,Auto">
-                <VerticalStackLayout Grid.Column="0" Spacing="2">
-                    <Label Text="Potential Duplicates"
-                           FontSize="15"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"/>
-                    <Label FontSize="12"
-                           TextColor="{StaticResource TextSecondary}">
-                        <Label.Text>
-                            <Binding Path="EstimatedDuplicates"
-                                     StringFormat="Estimated {0} tracks across your library."/>
-                        </Label.Text>
-                    </Label>
-                </VerticalStackLayout>
-
-                <Frame Grid.Column="1"
-                       BackgroundColor="{StaticResource SecondaryCyan}"
-                       CornerRadius="8"
-                       Padding="10,5"
-                       HasShadow="False"
-                       BorderColor="Transparent"
-                       VerticalOptions="Center">
-                    <Label FontSize="10"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource BackgroundColor}">
-                        <Label.Text>
-                            <Binding Path="EstimatedDuplicates"
-                                     StringFormat="{}{0} FOUND"/>
-                        </Label.Text>
-                    </Label>
-                </Frame>
-            </Grid>
+               BackgroundColor="#33FFD700"
+               CornerRadius="0"
+               Padding="24,12"
+               HasShadow="False"
+               BorderColor="Transparent"
+               IsVisible="{Binding ShowScanReminder}">
+            <Label Text="{Binding ScanReminderMessage}"
+                   FontSize="13"
+                   TextColor="{StaticResource PrimaryGold}"
+                   HorizontalTextAlignment="Center"/>
         </Frame>
 
+        <!-- Health Score + Duplicates (hidden until analysis exists) -->
+        <VerticalStackLayout Grid.Row="3"
+                             Margin="24,12,24,0"
+                             IsVisible="{Binding HasAnalysis}">
+            <Grid ColumnDefinitions="*,12,*">
+                <!-- Health Score -->
+                <Frame Grid.Column="0"
+                       Style="{StaticResource StatCard}">
+                    <Grid RowDefinitions="Auto,Auto" RowSpacing="2">
+                        <Label Text="HEALTH SCORE"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               CharacterSpacing="1.2"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto" ColumnSpacing="4">
+                            <Label Text="{Binding HealthScore}"
+                                   FontSize="28"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryGold}"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding HealthGrade}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="End"
+                                   Margin="0,0,0,4"/>
+                        </Grid>
+                    </Grid>
+                </Frame>
+
+                <!-- Potential Duplicates -->
+                <Frame Grid.Column="2"
+                       Style="{StaticResource StatCard}">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="DUPLICATES"
+                               FontSize="11"
+                               FontAttributes="Bold"
+                               CharacterSpacing="1.2"
+                               TextColor="{StaticResource TextSecondary}"/>
+                        <Label Text="{Binding EstimatedDuplicates}"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource SecondaryCyan}"/>
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- View History Button -->
+            <Button Text="View Scan History"
+                    Style="{StaticResource SecondaryButton}"
+                    Command="{Binding ViewHistoryCommand}"
+                    Margin="0,8,0,0"/>
+        </VerticalStackLayout>
+
         <!-- Studio Intelligence Card -->
-        <Frame Grid.Row="3"
+        <Frame Grid.Row="4"
                Style="{StaticResource GlassCard}"
                Margin="24,16,24,0"
                VerticalOptions="Center">
@@ -165,7 +193,7 @@
         </Frame>
 
         <!-- Loading & Status -->
-        <VerticalStackLayout Grid.Row="4"
+        <VerticalStackLayout Grid.Row="5"
                              Padding="24,0,24,24"
                              Spacing="8">
             <ActivityIndicator IsRunning="{Binding IsLoading}"

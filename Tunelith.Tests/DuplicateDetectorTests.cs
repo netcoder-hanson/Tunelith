@@ -105,5 +105,16 @@ public class DuplicateDetectorTests
         {
             return Task.FromResult(new List<GeminiDedupeResult>());
         }
+
+        public Task<List<PlaylistDescriptionResult>> GeneratePlaylistDescriptionsAsync(
+            List<PlaylistDescriptionInput> playlists,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.FromResult(playlists.Select(p => new PlaylistDescriptionResult
+            {
+                Name = p.Name,
+                Description = $"Tracks curated for {p.Name}"
+            }).ToList());
+        }
     }
 }

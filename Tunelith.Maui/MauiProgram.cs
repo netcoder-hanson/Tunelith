@@ -31,6 +31,8 @@ public static class MauiProgram
 
 		builder.Services.AddSingleton<CategorizationEngine>();
 		builder.Services.AddSingleton<DuplicateDetector>();
+		builder.Services.AddSingleton<HealthScoreService>();
+		builder.Services.AddSingleton<SmartDuplicateKeeper>();
 		builder.Services.AddSingleton<ScanSession>();
 		builder.Services.AddSingleton<SyncService>();
 
@@ -41,6 +43,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<AnalyzingStudioViewModel>();
 		builder.Services.AddTransient<DuplicateCleanupViewModel>();
 		builder.Services.AddTransient<LibraryMasteredViewModel>();
+		builder.Services.AddTransient<ScanHistoryViewModel>();
 
 		builder.Services.AddTransient<LoginPage>();
 		builder.Services.AddTransient<LibraryPage>();
@@ -49,6 +52,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<AnalyzingStudioPage>();
 		builder.Services.AddTransient<DuplicateCleanupPage>();
 		builder.Services.AddTransient<LibraryMasteredPage>();
+		builder.Services.AddTransient<ScanHistoryPage>();
 
 #if DEBUG
 		builder.Logging.AddDebug();

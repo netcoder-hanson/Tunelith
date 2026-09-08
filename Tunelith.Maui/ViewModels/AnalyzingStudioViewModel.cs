@@ -10,6 +10,9 @@ public class AnalyzingStudioViewModel : ViewModelBase
     private readonly TunelithDbContext _dbContext;
     private readonly CategorizationEngine _categorizationEngine;
     private readonly DuplicateDetector _duplicateDetector;
+    private readonly HealthScoreService _healthScoreService;
+    private readonly SmartDuplicateKeeper _smartDuplicateKeeper;
+    private readonly IGeminiService _geminiService;
     private readonly ScanSession _session;
 
     private bool _isProcessing = true;
@@ -104,12 +107,18 @@ public class AnalyzingStudioViewModel : ViewModelBase
         TunelithDbContext dbContext,
         CategorizationEngine categorizationEngine,
         DuplicateDetector duplicateDetector,
+        HealthScoreService healthScoreService,
+        SmartDuplicateKeeper smartDuplicateKeeper,
+        IGeminiService geminiService,
         ScanSession session)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
         _categorizationEngine = categorizationEngine;
         _duplicateDetector = duplicateDetector;
+        _healthScoreService = healthScoreService;
+        _smartDuplicateKeeper = smartDuplicateKeeper;
+        _geminiService = geminiService;
         _session = session;
 
         RetryCommand = new AsyncRelayCommand(RetryAsync);
@@ -188,8 +197,19 @@ public class AnalyzingStudioViewModel : ViewModelBase
             }).ToList();
 
             var duplicates = await _duplicateDetector.FindDuplicatesAsync(categorizedTracks);
-            ProgressPercent = 75;
+            ProgressPercent = 70;
             Step3Complete = true;
+
+            // Smart duplicate keeper: reorder groups so best track is first
+            var featuresDict2 = featuresDict;
+            foreach (var group in duplicates)
+            {
+                _smartDuplicateKeeper.ReorderGroup(group, featuresDict2);
+            }
+
+            StatusMessage = "Generating Playlist Descriptions";
+            CurrentStep = "Generating Playlist Descriptions";
+            ProgressPercent = 78;
 
             StatusMessage = "Re-sorting Genres";
             CurrentStep = "Re-sorting Genres";
@@ -202,6 +222,40 @@ public class AnalyzingStudioViewModel : ViewModelBase
             var categorizationResult = await _categorizationEngine.CategorizeAsync(
                 categorizedTracks, existingNames);
 
+            // Generate AI playlist descriptions
+            try
+            {
+                var descriptionInputs = categorizationResult.Categories.Select(c => new PlaylistDescriptionInput
+                {
+                    Name = c.Name,
+                    SampleTrackNames = c.TrackIds.Take(5)
+                        .Select(id => cachedTracks.FirstOrDefault(t => t.SpotifyTrackId == id)?.Name ?? "")
+                        .Where(n => !string.IsNullOrEmpty(n))
+                        .ToList(),
+                    Genres = categorizedTracks
+                        .Where(t => c.TrackIds.Contains(t.Track.Id))
+                        .SelectMany(t => t.ArtistGenres)
+                        .Distinct()
+                        .Take(5)
+                        .ToList()
+                }).ToList();
+
+                var descriptions = await _geminiService.GeneratePlaylistDescriptionsAsync(descriptionInputs);
+
+                foreach (var cat in categorizationResult.Categories)
+                {
+                    var aiDesc = descriptions.FirstOrDefault(d => d.Name == cat.Name);
+                    if (aiDesc != null && !string.IsNullOrWhiteSpace(aiDesc.Description))
+                    {
+                        cat.Description = aiDesc.Description;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Fallback: use default descriptions if Gemini fails
+            }
+
             foreach (var cat in categorizationResult.Categories)
             {
                 await _dbContext.UpsertCachedCategoryAsync(new CachedCategory
@@ -211,12 +265,31 @@ public class AnalyzingStudioViewModel : ViewModelBase
                 });
             }
 
+            ProgressPercent = 95;
+            StatusMessage = "Calculating Health Score";
+
+            // Calculate health score
+            var healthScore = _healthScoreService.Calculate(
+                TotalTracks, duplicates.Count, categorizationResult);
+
             ProgressPercent = 100;
             StatusMessage = "Analysis Complete";
 
             // Store results in session for downstream screens
             _session.CategorizationResult = categorizationResult;
             _session.Duplicates = duplicates;
+            _session.HealthScore = healthScore.OverallScore;
+
+            // Store scan history
+            await _dbContext.StoreScanHistoryAsync(new CachedScanHistory
+            {
+                TotalTracks = TotalTracks,
+                LikedSongsCount = cachedTracks.Count,
+                PlaylistsCount = (await _dbContext.GetCachedPlaylistsAsync()).Count,
+                DuplicatesFound = duplicates.Count,
+                CategoriesCreated = categorizationResult.Categories.Count,
+                HealthScore = healthScore.OverallScore
+            });
 
             await Task.Delay(500);
 

@@ -61,6 +61,34 @@ public class LibraryViewModel : ViewModelBase
         set => SetProperty(ref _hasAnalysis, value);
     }
 
+    private int _healthScore;
+    public int HealthScore
+    {
+        get => _healthScore;
+        set => SetProperty(ref _healthScore, value);
+    }
+
+    private string _healthGrade = string.Empty;
+    public string HealthGrade
+    {
+        get => _healthGrade;
+        set => SetProperty(ref _healthGrade, value);
+    }
+
+    private bool _showScanReminder;
+    public bool ShowScanReminder
+    {
+        get => _showScanReminder;
+        set => SetProperty(ref _showScanReminder, value);
+    }
+
+    private string _scanReminderMessage = string.Empty;
+    public string ScanReminderMessage
+    {
+        get => _scanReminderMessage;
+        set => SetProperty(ref _scanReminderMessage, value);
+    }
+
     private List<CachedPlaylist> _playlists = new();
     public List<CachedPlaylist> Playlists
     {
@@ -71,6 +99,7 @@ public class LibraryViewModel : ViewModelBase
     public AsyncRelayCommand ScanLibraryCommand { get; }
     public AsyncRelayCommand StartCategorizationCommand { get; }
     public AsyncRelayCommand LogoutCommand { get; }
+    public AsyncRelayCommand ViewHistoryCommand { get; }
 
     public LibraryViewModel(
         ISpotifyApiClient spotifyClient,
@@ -88,6 +117,7 @@ public class LibraryViewModel : ViewModelBase
         ScanLibraryCommand = new AsyncRelayCommand(ScanLibraryAsync);
         StartCategorizationCommand = new AsyncRelayCommand(StartCategorizationAsync);
         LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+        ViewHistoryCommand = new AsyncRelayCommand(ViewHistoryAsync);
     }
 
     public async Task InitializeAsync()
@@ -101,7 +131,70 @@ public class LibraryViewModel : ViewModelBase
             TotalTracks = cachedCount + Playlists.Sum(p => p.TotalTracks);
         }
 
-        HasAnalysis = await _dbContext.GetCachedTrackCountAsync() > 0;
+        HasAnalysis = cachedCount > 0;
+
+        // Load health score from last scan
+        var lastScan = await _dbContext.GetLastScanHistoryAsync();
+        if (lastScan != null)
+        {
+            HealthScore = lastScan.HealthScore;
+            HealthGrade = HealthScore switch
+            {
+                >= 90 => "A+",
+                >= 80 => "A",
+                >= 70 => "B+",
+                >= 60 => "B",
+                >= 50 => "C+",
+                >= 40 => "C",
+                >= 30 => "D",
+                _ => "F"
+            };
+            EstimatedDuplicates = lastScan.DuplicatesFound;
+        }
+
+        // Check scan reminder
+        await CheckScanReminderAsync();
+    }
+
+    private async Task CheckScanReminderAsync()
+    {
+        var lastScan = await _dbContext.GetLastScanHistoryAsync();
+        if (lastScan == null)
+        {
+            ShowScanReminder = false;
+            return;
+        }
+
+        var intervalStr = await _dbContext.GetUserPreferenceAsync("scan_reminder_interval");
+        if (string.IsNullOrEmpty(intervalStr) || !int.TryParse(intervalStr, out int intervalDays))
+        {
+            intervalDays = 14; // default: 14 days
+        }
+
+        var elapsed = DateTime.UtcNow - lastScan.ScannedAt;
+        if (elapsed.TotalDays >= intervalDays)
+        {
+            var daysText = intervalDays switch
+            {
+                7 => "weekly",
+                14 => "biweekly",
+                30 => "monthly",
+                90 => "quarterly",
+                180 => "semi-annually",
+                _ => $"every {intervalDays} days"
+            };
+            ScanReminderMessage = $"Last scan was {elapsed.Days} days ago. Consider scanning {daysText}.";
+            ShowScanReminder = true;
+        }
+        else
+        {
+            ShowScanReminder = false;
+        }
+    }
+
+    private async Task ViewHistoryAsync()
+    {
+        await Shell.Current.GoToAsync("ScanHistoryPage");
     }
 
     public async Task LogoutAsync()

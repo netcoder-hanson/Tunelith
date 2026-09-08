@@ -19,6 +19,8 @@ public class TunelithDbContext
         await _database.CreateTableAsync<CachedPlaylist>();
         await _database.CreateTableAsync<CachedPlaylistTrack>();
         await _database.CreateTableAsync<CachedCategory>();
+        await _database.CreateTableAsync<CachedScanHistory>();
+        await _database.CreateTableAsync<CachedUserPreference>();
     }
 
     public async Task<List<CachedTrack>> GetCachedTracksAsync()
@@ -140,5 +142,49 @@ public class TunelithDbContext
     public async Task<int> GetCachedTrackCountAsync()
     {
         return await _database.Table<CachedTrack>().CountAsync();
+    }
+
+    public async Task StoreScanHistoryAsync(CachedScanHistory history)
+    {
+        await _database.InsertAsync(history);
+    }
+
+    public async Task<List<CachedScanHistory>> GetScanHistoryAsync()
+    {
+        return await _database.Table<CachedScanHistory>()
+            .OrderByDescending(h => h.ScannedAt)
+            .ToListAsync();
+    }
+
+    public async Task<CachedScanHistory?> GetLastScanHistoryAsync()
+    {
+        return await _database.Table<CachedScanHistory>()
+            .OrderByDescending(h => h.ScannedAt)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<string?> GetUserPreferenceAsync(string key)
+    {
+        var pref = await _database.Table<CachedUserPreference>()
+            .Where(p => p.Key == key)
+            .FirstOrDefaultAsync();
+        return pref?.Value;
+    }
+
+    public async Task SetUserPreferenceAsync(string key, string value)
+    {
+        var existing = await _database.Table<CachedUserPreference>()
+            .Where(p => p.Key == key)
+            .FirstOrDefaultAsync();
+
+        if (existing != null)
+        {
+            existing.Value = value;
+            await _database.UpdateAsync(existing);
+        }
+        else
+        {
+            await _database.InsertAsync(new CachedUserPreference { Key = key, Value = value });
+        }
     }
 }

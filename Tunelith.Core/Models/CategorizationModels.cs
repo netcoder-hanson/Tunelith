@@ -132,3 +132,25 @@ public class GeminiDedupeResult
     [JsonPropertyName("reason")]
     public string Reason { get; set; } = string.Empty;
 }
+
+public class PlaylistDescriptionInput
+{
+    public string Name { get; set; } = string.Empty;
+    public List<string> SampleTrackNames { get; set; } = new();
+    public List<string> Genres { get; set; } = new();
+}
+
+public class PlaylistDescriptionResult
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonPropertyName("description")]
+    public string Description { get; set; } = string.Empty;
+}
+
+public class GeminiPlaylistDescriptionResponse
+{
+    [JsonPropertyName("playlists")]
+    public List<PlaylistDescriptionResult> Playlists { get; set; } = new();
+}

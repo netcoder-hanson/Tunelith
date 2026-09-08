@@ -32,6 +32,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton<CategorizationEngine>();
 		builder.Services.AddSingleton<DuplicateDetector>();
 		builder.Services.AddSingleton<ScanSession>();
+		builder.Services.AddSingleton<SyncService>();
 
 		builder.Services.AddTransient<LoginViewModel>();
 		builder.Services.AddTransient<LibraryViewModel>();

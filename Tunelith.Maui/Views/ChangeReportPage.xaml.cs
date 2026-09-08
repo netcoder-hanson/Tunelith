@@ -13,9 +13,9 @@ public partial class ChangeReportPage : ContentPage
 		BindingContext = _viewModel;
 	}
 
-	protected override async void OnAppearing()
+	protected override void OnAppearing()
 	{
 		base.OnAppearing();
-		await _viewModel.InitializeFromNavigationAsync();
+		_viewModel.InitializeFromSession();
 	}
 }

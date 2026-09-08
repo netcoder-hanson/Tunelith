@@ -8,6 +8,7 @@ public class ChangeReportViewModel : ViewModelBase
 {
     private readonly ISpotifyApiClient _spotifyClient;
     private readonly TunelithDbContext _dbContext;
+    private readonly ScanSession _session;
 
     private bool _isApplying;
     public bool IsApplying
@@ -47,16 +48,25 @@ public class ChangeReportViewModel : ViewModelBase
     public AsyncRelayCommand ApplyChangesCommand { get; }
     public AsyncRelayCommand ReviewSelectiveCommand { get; }
 
-    public ChangeReportViewModel(ISpotifyApiClient spotifyClient, TunelithDbContext dbContext)
+    public ChangeReportViewModel(
+        ISpotifyApiClient spotifyClient,
+        TunelithDbContext dbContext,
+        ScanSession session)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
+        _session = session;
         ApplyChangesCommand = new AsyncRelayCommand(ApplyChangesAsync);
         ReviewSelectiveCommand = new AsyncRelayCommand(ReviewSelectiveAsync);
     }
 
-    public void LoadReport(CategorizationResult categorizationResult, List<DuplicateGroup> duplicates)
+    public void InitializeFromSession()
     {
+        var categorizationResult = _session.CategorizationResult;
+        var duplicates = _session.Duplicates;
+
+        if (categorizationResult is null) return;
+
         Categories = categorizationResult.Categories;
         Duplicates = duplicates;
 
@@ -74,13 +84,6 @@ public class ChangeReportViewModel : ViewModelBase
         };
     }
 
-    public async Task InitializeFromNavigationAsync()
-    {
-        var accessToken = await SecureStorage.GetAsync("spotify_access_token");
-        if (string.IsNullOrEmpty(accessToken)) return;
-        await _spotifyClient.SetTokenAsync(accessToken);
-    }
-
     private async Task ApplyChangesAsync()
     {
         IsApplying = true;
@@ -88,9 +91,14 @@ public class ChangeReportViewModel : ViewModelBase
 
         try
         {
+            var accessToken = await SecureStorage.GetAsync("spotify_access_token");
+            if (string.IsNullOrEmpty(accessToken)) return;
+            await _spotifyClient.SetTokenAsync(accessToken);
+
             var userId = (await _spotifyClient.GetCurrentUserIdAsync()).Id;
 
             StatusMessage = "Creating playlists...";
+            int playlistsCreated = 0;
             foreach (var playlistChange in Report.PlaylistsToCreate)
             {
                 var playlist = await _spotifyClient.CreatePlaylistAsync(
@@ -101,7 +109,31 @@ public class ChangeReportViewModel : ViewModelBase
                     await _spotifyClient.AddTracksToPlaylistAsync(
                         playlist.Id, playlistChange.TrackIds);
                 }
+                playlistsCreated++;
             }
+
+            StatusMessage = "Removing duplicates...";
+            int duplicatesRemoved = 0;
+            foreach (var duplicate in Report.DuplicatesToRemove)
+            {
+                if (duplicate.Tracks.Count > 1)
+                {
+                    // Remove duplicate tracks from the user's liked songs
+                    var trackIdsToRemove = duplicate.Tracks.Skip(1).Select(t => t.Id).ToList();
+                    if (trackIdsToRemove.Any())
+                    {
+                        await _spotifyClient.RemoveSavedTracksAsync(trackIdsToRemove);
+                    }
+                    duplicatesRemoved++;
+                }
+            }
+
+            int tracksResorted = Report.TotalTracksResorted;
+
+            // Store stats in session for the success screen
+            _session.DuplicatesRemoved = duplicatesRemoved;
+            _session.NewPlaylists = playlistsCreated;
+            _session.TracksResorted = tracksResorted;
 
             StatusMessage = "Changes applied successfully!";
 

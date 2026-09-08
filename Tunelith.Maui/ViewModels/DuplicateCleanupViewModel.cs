@@ -4,6 +4,8 @@ namespace Tunelith.Maui.ViewModels;
 
 public class DuplicateCleanupViewModel : ViewModelBase
 {
+    private readonly ScanSession _session;
+
     private string _statusMessage = string.Empty;
     public string StatusMessage
     {
@@ -25,18 +27,17 @@ public class DuplicateCleanupViewModel : ViewModelBase
         set => SetProperty(ref _duplicateItems, value);
     }
 
-    private List<DuplicateGroup> _duplicates = new();
-
     public AsyncRelayCommand ConfirmSelectionCommand { get; }
 
-    public DuplicateCleanupViewModel()
+    public DuplicateCleanupViewModel(ScanSession session)
     {
+        _session = session;
         ConfirmSelectionCommand = new AsyncRelayCommand(ConfirmSelectionAsync);
     }
 
-    public void LoadDuplicates(List<DuplicateGroup> duplicates)
+    public void InitializeFromSession()
     {
-        _duplicates = duplicates;
+        var duplicates = _session.Duplicates;
         var items = new List<DuplicateTrackItem>();
 
         foreach (var group in duplicates)
@@ -53,12 +54,22 @@ public class DuplicateCleanupViewModel : ViewModelBase
         }
 
         DuplicateItems = items;
+        _session.DuplicateItems = items;
         DuplicateCount = items.Count(i => i.IsDuplicate);
         StatusMessage = $"{DuplicateCount} TRACKS IDENTIFIED";
     }
 
     private async Task ConfirmSelectionAsync()
     {
+        // Sync toggle state back to session
+        foreach (var item in DuplicateItems)
+        {
+            var existing = _session.DuplicateItems.FirstOrDefault(d =>
+                d.Track.Id == item.Track.Id);
+            if (existing is not null)
+                existing.IsDuplicate = item.IsDuplicate;
+        }
+
         await Shell.Current.GoToAsync("LibraryMasteredPage");
     }
 }

@@ -17,6 +17,7 @@ public interface ISpotifyApiClient
     Task<SpotifyPlaylist> CreatePlaylistAsync(string userId, string name, string? description, bool isPublic);
     Task AddTracksToPlaylistAsync(string playlistId, IEnumerable<string> trackIds);
     Task RemoveTracksFromPlaylistAsync(string playlistId, IEnumerable<string> trackIds);
+    Task RemoveSavedTracksAsync(IEnumerable<string> trackIds);
 }
 
 public class SpotifyApiClient : ISpotifyApiClient
@@ -206,6 +207,27 @@ public class SpotifyApiClient : ISpotifyApiClient
 
             await _rateLimitHandler.WaitForSpotifySlot();
             var request = new HttpRequestMessage(HttpMethod.Delete, $"/playlists/{playlistId}/tracks")
+            {
+                Content = content
+            };
+            await _rateLimitHandler.ExecuteWithBackoff(
+                ct => SendAsync<object>(request),
+                _rateLimitHandler.GetSpotifyRetryDelay);
+        }
+    }
+
+    public async Task RemoveSavedTracksAsync(IEnumerable<string> trackIds)
+    {
+        var idList = trackIds.ToList();
+
+        for (int i = 0; i < idList.Count; i += 50)
+        {
+            var batch = idList.Skip(i).Take(50);
+            var body = JsonSerializer.Serialize(new { ids = batch });
+            var content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+
+            await _rateLimitHandler.WaitForSpotifySlot();
+            var request = new HttpRequestMessage(HttpMethod.Delete, "/me/tracks")
             {
                 Content = content
             };

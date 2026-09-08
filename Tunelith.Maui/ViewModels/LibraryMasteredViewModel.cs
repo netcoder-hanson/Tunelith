@@ -4,6 +4,8 @@ namespace Tunelith.Maui.ViewModels;
 
 public class LibraryMasteredViewModel : ViewModelBase
 {
+    private readonly ScanSession _session;
+
     private int _duplicatesRemoved;
     public int DuplicatesRemoved
     {
@@ -28,21 +30,23 @@ public class LibraryMasteredViewModel : ViewModelBase
     public AsyncRelayCommand ReturnToDashboardCommand { get; }
     public AsyncRelayCommand ShareStatsCommand { get; }
 
-    public LibraryMasteredViewModel()
+    public LibraryMasteredViewModel(ScanSession session)
     {
+        _session = session;
         ReturnToDashboardCommand = new AsyncRelayCommand(ReturnToDashboardAsync);
         ShareStatsCommand = new AsyncRelayCommand(ShareStatsAsync);
     }
 
-    public void LoadStats(int duplicatesRemoved, int newPlaylists, int tracksResorted)
+    public void InitializeFromSession()
     {
-        DuplicatesRemoved = duplicatesRemoved;
-        NewPlaylists = newPlaylists;
-        TracksResorted = tracksResorted;
+        DuplicatesRemoved = _session.DuplicatesRemoved;
+        NewPlaylists = _session.NewPlaylists;
+        TracksResorted = _session.TracksResorted;
     }
 
     private async Task ReturnToDashboardAsync()
     {
+        _session.Clear();
         await Shell.Current.GoToAsync("//LibraryPage");
     }
 

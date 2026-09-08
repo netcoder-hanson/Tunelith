@@ -10,6 +10,7 @@ public class AnalyzingStudioViewModel : ViewModelBase
     private readonly TunelithDbContext _dbContext;
     private readonly CategorizationEngine _categorizationEngine;
     private readonly DuplicateDetector _duplicateDetector;
+    private readonly ScanSession _session;
 
     private bool _isProcessing = true;
     public bool IsProcessing
@@ -81,19 +82,18 @@ public class AnalyzingStudioViewModel : ViewModelBase
         set => SetProperty(ref _step4Pending, value);
     }
 
-    public CategorizationResult? CategorizationResult { get; private set; }
-    public List<DuplicateGroup> Duplicates { get; private set; } = new();
-
     public AnalyzingStudioViewModel(
         ISpotifyApiClient spotifyClient,
         TunelithDbContext dbContext,
         CategorizationEngine categorizationEngine,
-        DuplicateDetector duplicateDetector)
+        DuplicateDetector duplicateDetector,
+        ScanSession session)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
         _categorizationEngine = categorizationEngine;
         _duplicateDetector = duplicateDetector;
+        _session = session;
     }
 
     public async Task RunAnalysisAsync()
@@ -167,7 +167,7 @@ public class AnalyzingStudioViewModel : ViewModelBase
                 };
             }).ToList();
 
-            Duplicates = await _duplicateDetector.FindDuplicatesAsync(categorizedTracks);
+            var duplicates = await _duplicateDetector.FindDuplicatesAsync(categorizedTracks);
             ProgressPercent = 75;
             Step3Complete = true;
 
@@ -179,10 +179,10 @@ public class AnalyzingStudioViewModel : ViewModelBase
             var existingCategories = await _dbContext.GetCachedCategoriesAsync();
             var existingNames = existingCategories.Select(c => c.Name).ToList();
 
-            CategorizationResult = await _categorizationEngine.CategorizeAsync(
+            var categorizationResult = await _categorizationEngine.CategorizeAsync(
                 categorizedTracks, existingNames);
 
-            foreach (var cat in CategorizationResult.Categories)
+            foreach (var cat in categorizationResult.Categories)
             {
                 await _dbContext.UpsertCachedCategoryAsync(new CachedCategory
                 {
@@ -193,6 +193,10 @@ public class AnalyzingStudioViewModel : ViewModelBase
 
             ProgressPercent = 100;
             StatusMessage = "Analysis Complete";
+
+            // Store results in session for downstream screens
+            _session.CategorizationResult = categorizationResult;
+            _session.Duplicates = duplicates;
 
             await Task.Delay(500);
 

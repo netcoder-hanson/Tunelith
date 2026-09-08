@@ -4,9 +4,18 @@ namespace Tunelith.Maui.Views;
 
 public partial class LibraryMasteredPage : ContentPage
 {
-    public LibraryMasteredPage(LibraryMasteredViewModel viewModel)
-    {
-        InitializeComponent();
-        BindingContext = viewModel;
-    }
+	private readonly LibraryMasteredViewModel _viewModel;
+
+	public LibraryMasteredPage(LibraryMasteredViewModel viewModel)
+	{
+		InitializeComponent();
+		_viewModel = viewModel;
+		BindingContext = _viewModel;
+	}
+
+	protected override void OnAppearing()
+	{
+		base.OnAppearing();
+		_viewModel.InitializeFromSession();
+	}
 }

@@ -70,10 +70,34 @@
                        HorizontalTextAlignment="Center"
                        LineBreakMode="WordWrap"/>
 
+                <!-- Terms checkbox row -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"
+                      Margin="0,4,0,0">
+                    <CheckBox Grid.Column="0"
+                              IsChecked="{Binding TermsAccepted}"
+                              Color="{StaticResource PrimaryGold}"
+                              VerticalOptions="Center"/>
+                    <Label Grid.Column="1"
+                           Text="I agree to the Terms of Service"
+                           FontSize="12"
+                           TextColor="{StaticResource TextSecondary}"
+                           VerticalOptions="Center"/>
+                    <Label Grid.Column="2"
+                           Text="View"
+                           FontSize="12"
+                           TextColor="{StaticResource SecondaryCyan}"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ShowTermsCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
                 <!-- Connect Button -->
                 <Button Text="Connect with Spotify"
                         Style="{StaticResource PrimaryButton}"
                         Command="{Binding LoginCommand}"
+                        IsEnabled="{Binding CanConnect}"
                         Margin="0,8,0,0"/>
 
                 <!-- Studio Label -->
@@ -100,14 +124,56 @@
                    Margin="0,12,0,0"/>
         </VerticalStackLayout>
 
-        <!-- Terms footer -->
-        <Label Grid.Row="1"
-               Text="By connecting, you agree to Tunelith's Terms of Service."
-               FontSize="11"
-               TextColor="{StaticResource TextMuted}"
-               HorizontalTextAlignment="Center"
-               Margin="0,0,0,12"
-               VerticalOptions="End"/>
+        <!-- Terms Modal Overlay -->
+        <Grid Grid.Row="0"
+              IsVisible="{Binding ShowTermsModal}"
+              Grid.RowSpan="2">
+            <!-- Backdrop -->
+            <Grid BackgroundColor="#CC000000">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding CloseTermsCommand}"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+
+            <!-- Modal Card -->
+            <Frame Style="{StaticResource GlassCard}"
+                   CornerRadius="16"
+                   Padding="24"
+                   Margin="24"
+                   VerticalOptions="Center"
+                   HasShadow="True">
+
+                <ScrollView MaximumHeightRequest="500">
+                    <VerticalStackLayout Spacing="16">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0"
+                                   Text="Terms of Service"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Grid.Column="1"
+                                   Text="✕"
+                                   FontSize="18"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding CloseTermsCommand}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </Grid>
+
+                        <Label FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"
+                               LineBreakMode="WordWrap"
+                               Text="By connecting your Spotify account, you agree to the following:&#x0a;&#x0a;• Tunelith accesses your liked songs and playlists to analyze and organize your music library.&#x0a;&#x0a;• Tunelith may create new playlists and remove duplicate tracks — but only changes you explicitly approve are ever applied.&#x0a;&#x0a;• Your library data is stored locally on your device and is not sold or shared with third parties.&#x0a;&#x0a;• AI-assisted categorization (via Google Gemini) processes track metadata to suggest organization — no personal account data is sent beyond track/artist names and audio characteristics.&#x0a;&#x0a;• You can revoke Tunelith's access at any time from your Spotify account's connected apps settings.&#x0a;&#x0a;Tunelith is an independent tool and is not affiliated with or endorsed by Spotify."/>
+
+                        <Button Text="I Understand"
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding AcceptTermsCommand}"/>
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Frame>
+        </Grid>
 
     </Grid>
 

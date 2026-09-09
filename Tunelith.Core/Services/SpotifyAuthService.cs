@@ -22,7 +22,7 @@ public class SpotifyAuthService : ISpotifyAuthService
 {
     private readonly HttpClient _httpClient;
     private readonly ISecureStorageService _secureStorage;
-    private const string ClientId = "YOUR_SPOTIFY_CLIENT_ID";
+    private const string ClientId = "c8deefe6498942ac892f366786191139";
     private const string RedirectUri = "tunelith://callback";
     private const string AuthEndpoint = "https://accounts.spotify.com/authorize";
     private const string TokenEndpoint = "https://accounts.spotify.com/api/token";

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 using Tunelith.Core.Services;
 using Tunelith.Data;
@@ -8,6 +9,7 @@ public class ChangeReportViewModel : ViewModelBase
 {
     private readonly ScanSession _session;
     private readonly SyncService _syncService;
+    private readonly ILogger<ChangeReportViewModel> _logger;
 
     private bool _isApplying;
     public bool IsApplying
@@ -47,10 +49,11 @@ public class ChangeReportViewModel : ViewModelBase
     public AsyncRelayCommand ApplyChangesCommand { get; }
     public AsyncRelayCommand ReviewSelectiveCommand { get; }
 
-    public ChangeReportViewModel(ScanSession session, SyncService syncService)
+    public ChangeReportViewModel(ScanSession session, SyncService syncService, ILogger<ChangeReportViewModel> logger)
     {
         _session = session;
         _syncService = syncService;
+        _logger = logger;
         ApplyChangesCommand = new AsyncRelayCommand(ApplyChangesAsync);
         ReviewSelectiveCommand = new AsyncRelayCommand(ReviewSelectiveAsync);
     }
@@ -96,7 +99,8 @@ public class ChangeReportViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error applying changes: {ex.Message}";
+            _logger.LogError(ex, "Failed to apply changes to Spotify");
+            StatusMessage = "Failed to apply changes. Please try again.";
         }
         finally
         {

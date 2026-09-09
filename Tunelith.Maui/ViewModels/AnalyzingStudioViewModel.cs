@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 using Tunelith.Core.Services;
 using Tunelith.Data;
@@ -14,6 +15,7 @@ public class AnalyzingStudioViewModel : ViewModelBase
     private readonly SmartDuplicateKeeper _smartDuplicateKeeper;
     private readonly IGeminiService _geminiService;
     private readonly ScanSession _session;
+    private readonly ILogger<AnalyzingStudioViewModel> _logger;
 
     private bool _isProcessing = true;
     public bool IsProcessing
@@ -110,7 +112,8 @@ public class AnalyzingStudioViewModel : ViewModelBase
         HealthScoreService healthScoreService,
         SmartDuplicateKeeper smartDuplicateKeeper,
         IGeminiService geminiService,
-        ScanSession session)
+        ScanSession session,
+        ILogger<AnalyzingStudioViewModel> logger)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
@@ -120,6 +123,7 @@ public class AnalyzingStudioViewModel : ViewModelBase
         _smartDuplicateKeeper = smartDuplicateKeeper;
         _geminiService = geminiService;
         _session = session;
+        _logger = logger;
 
         RetryCommand = new AsyncRelayCommand(RetryAsync);
         GoBackCommand = new AsyncRelayCommand(GoBackAsync);
@@ -297,8 +301,9 @@ public class AnalyzingStudioViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Library analysis failed");
             HasError = true;
-            ErrorMessage = $"Analysis failed: {ex.Message}";
+            ErrorMessage = "Analysis failed. Please try again.";
             StatusMessage = "Something went wrong.";
         }
         finally

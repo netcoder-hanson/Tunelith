@@ -8,6 +8,15 @@
 
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" Padding="0">
 
+        <!-- Ambient Background Glow -->
+        <Grid Grid.Row="0" Grid.RowSpan="3">
+            <Ellipse Fill="#1500E5FF"
+                     WidthRequest="300" HeightRequest="300"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Start"
+                     Margin="0,-80,0,0"/>
+        </Grid>
+
         <!-- Header -->
         <Grid Grid.Row="0" Padding="24,24,24,0" ColumnDefinitions="*,Auto">
             <VerticalStackLayout Grid.Column="0">
@@ -23,21 +32,21 @@
                        Margin="0,2,0,0"/>
             </VerticalStackLayout>
 
-            <!-- Logout button -->
+            <!-- Profile photo / Logout button -->
             <Frame Grid.Column="1"
                    BackgroundColor="{StaticResource SurfaceColor}"
                    BorderColor="{StaticResource CardBorder}"
                    CornerRadius="20"
                    Padding="0"
                    HeightRequest="40" WidthRequest="40"
-                   HasShadow="False">
+                   HasShadow="False"
+                   IsClippedToBounds="True">
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding LogoutCommand}"/>
                 </Frame.GestureRecognizers>
-                <Label Text="👤"
-                       FontSize="16"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"/>
+                <Image Source="{Binding ProfileImageUrl}"
+                       Aspect="AspectFill"
+                       HeightRequest="40" WidthRequest="40"/>
             </Frame>
         </Grid>
 
@@ -55,7 +64,12 @@
                     <Label Text="{Binding LikedSongsCount}"
                            FontSize="32"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"/>
+                           TextColor="{StaticResource TextPrimary}">
+                        <Label.Shadow>
+                            <Shadow Brush="{StaticResource PrimaryGold}"
+                                    Offset="0,0" Radius="12" Opacity="0.4"/>
+                        </Label.Shadow>
+                    </Label>
                 </VerticalStackLayout>
             </Frame>
 
@@ -71,7 +85,12 @@
                     <Label Text="{Binding PlaylistsCount}"
                            FontSize="32"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"/>
+                           TextColor="{StaticResource TextPrimary}">
+                        <Label.Shadow>
+                            <Shadow Brush="{StaticResource SecondaryCyan}"
+                                    Offset="0,0" Radius="12" Opacity="0.4"/>
+                        </Label.Shadow>
+                    </Label>
                 </VerticalStackLayout>
             </Frame>
         </Grid>
@@ -108,7 +127,12 @@
                             <Label Text="{Binding HealthScore}"
                                    FontSize="28"
                                    FontAttributes="Bold"
-                                   TextColor="{StaticResource PrimaryGold}"/>
+                                   TextColor="{StaticResource PrimaryGold}">
+                                <Label.Shadow>
+                                    <Shadow Brush="{StaticResource PrimaryGold}"
+                                            Offset="0,0" Radius="10" Opacity="0.5"/>
+                                </Label.Shadow>
+                            </Label>
                             <Label Grid.Column="1"
                                    Text="{Binding HealthGrade}"
                                    FontSize="16"
@@ -132,7 +156,12 @@
                         <Label Text="{Binding EstimatedDuplicates}"
                                FontSize="28"
                                FontAttributes="Bold"
-                               TextColor="{StaticResource SecondaryCyan}"/>
+                               TextColor="{StaticResource SecondaryCyan}">
+                            <Label.Shadow>
+                                <Shadow Brush="{StaticResource SecondaryCyan}"
+                                        Offset="0,0" Radius="10" Opacity="0.5"/>
+                            </Label.Shadow>
+                        </Label>
                     </VerticalStackLayout>
                 </Frame>
             </Grid>
@@ -158,8 +187,9 @@
                            CornerRadius="14"
                            Padding="0"
                            HasShadow="False">
-                        <Label Text="🧠"
+                        <Label Text="✦"
                                FontSize="24"
+                               TextColor="{StaticResource PrimaryGold}"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"/>
                     </Frame>

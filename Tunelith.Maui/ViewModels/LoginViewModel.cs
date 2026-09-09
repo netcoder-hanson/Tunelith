@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 using Tunelith.Core.Services;
 using Tunelith.Data;
@@ -8,6 +9,7 @@ public class LoginViewModel : ViewModelBase
 {
     private readonly ISpotifyAuthService _authService;
     private readonly TunelithDbContext _dbContext;
+    private readonly ILogger<LoginViewModel> _logger;
 
     private bool _isLoading;
     public bool IsLoading
@@ -48,10 +50,11 @@ public class LoginViewModel : ViewModelBase
     public AsyncRelayCommand AcceptTermsCommand { get; }
     public AsyncRelayCommand CloseTermsCommand { get; }
 
-    public LoginViewModel(ISpotifyAuthService authService, TunelithDbContext dbContext)
+    public LoginViewModel(ISpotifyAuthService authService, TunelithDbContext dbContext, ILogger<LoginViewModel> logger)
     {
         _authService = authService;
         _dbContext = dbContext;
+        _logger = logger;
         LoginCommand = new AsyncRelayCommand(LoginAsync);
         ShowTermsCommand = new AsyncRelayCommand(() => { ShowTermsModal = true; return Task.CompletedTask; });
         AcceptTermsCommand = new AsyncRelayCommand(AcceptTermsAsync);
@@ -105,7 +108,8 @@ public class LoginViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Login failed: {ex.Message}";
+            _logger.LogError(ex, "Spotify login failed");
+            StatusMessage = "Login failed. Please try again.";
         }
         finally
         {

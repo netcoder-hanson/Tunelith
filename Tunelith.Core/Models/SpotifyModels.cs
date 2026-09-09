@@ -56,10 +56,10 @@ public class SpotifyImage
     public string Url { get; set; } = string.Empty;
 
     [JsonPropertyName("height")]
-    public int Height { get; set; }
+    public int? Height { get; set; }
 
     [JsonPropertyName("width")]
-    public int Width { get; set; }
+    public int? Width { get; set; }
 }
 
 public class SpotifyPlaylist
@@ -99,6 +99,9 @@ public class SpotifyUser
 
     [JsonPropertyName("display_name")]
     public string? DisplayName { get; set; }
+
+    [JsonPropertyName("images")]
+    public List<SpotifyImage> Images { get; set; } = new();
 }
 
 public class SpotifyAudioFeatures

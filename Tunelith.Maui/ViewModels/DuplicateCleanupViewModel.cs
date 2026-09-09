@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 
 namespace Tunelith.Maui.ViewModels;
@@ -6,6 +7,7 @@ public class DuplicateCleanupViewModel : ViewModelBase
 {
     private readonly ScanSession _session;
     private readonly SyncService _syncService;
+    private readonly ILogger<DuplicateCleanupViewModel> _logger;
 
     private bool _isApplying;
     public bool IsApplying
@@ -37,10 +39,11 @@ public class DuplicateCleanupViewModel : ViewModelBase
 
     public AsyncRelayCommand ConfirmSelectionCommand { get; }
 
-    public DuplicateCleanupViewModel(ScanSession session, SyncService syncService)
+    public DuplicateCleanupViewModel(ScanSession session, SyncService syncService, ILogger<DuplicateCleanupViewModel> logger)
     {
         _session = session;
         _syncService = syncService;
+        _logger = logger;
         ConfirmSelectionCommand = new AsyncRelayCommand(ConfirmSelectionAsync);
     }
 
@@ -123,7 +126,8 @@ public class DuplicateCleanupViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            _logger.LogError(ex, "Failed to apply duplicate cleanup");
+            StatusMessage = "Failed to apply changes. Please try again.";
         }
         finally
         {

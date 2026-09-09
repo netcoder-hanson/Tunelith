@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 using Tunelith.Core.Services;
 using Tunelith.Data;
@@ -11,6 +12,7 @@ public class LibraryViewModel : ViewModelBase
     private readonly TunelithDbContext _dbContext;
     private readonly CategorizationEngine _categorizationEngine;
     private readonly DuplicateDetector _duplicateDetector;
+    private readonly ILogger<LibraryViewModel> _logger;
 
     private bool _isLoading;
     public bool IsLoading
@@ -89,6 +91,20 @@ public class LibraryViewModel : ViewModelBase
         set => SetProperty(ref _scanReminderMessage, value);
     }
 
+    private string _profileImageUrl = string.Empty;
+    public string ProfileImageUrl
+    {
+        get => _profileImageUrl;
+        set => SetProperty(ref _profileImageUrl, value);
+    }
+
+    private string _userName = string.Empty;
+    public string UserName
+    {
+        get => _userName;
+        set => SetProperty(ref _userName, value);
+    }
+
     private List<CachedPlaylist> _playlists = new();
     public List<CachedPlaylist> Playlists
     {
@@ -106,13 +122,15 @@ public class LibraryViewModel : ViewModelBase
         ISpotifyAuthService authService,
         TunelithDbContext dbContext,
         CategorizationEngine categorizationEngine,
-        DuplicateDetector duplicateDetector)
+        DuplicateDetector duplicateDetector,
+        ILogger<LibraryViewModel> logger)
     {
         _spotifyClient = spotifyClient;
         _authService = authService;
         _dbContext = dbContext;
         _categorizationEngine = categorizationEngine;
         _duplicateDetector = duplicateDetector;
+        _logger = logger;
 
         ScanLibraryCommand = new AsyncRelayCommand(ScanLibraryAsync);
         StartCategorizationCommand = new AsyncRelayCommand(StartCategorizationAsync);
@@ -122,6 +140,23 @@ public class LibraryViewModel : ViewModelBase
 
     public async Task InitializeAsync()
     {
+        // Fetch Spotify profile for avatar
+        try
+        {
+            var accessToken = await SecureStorage.GetAsync("spotify_access_token");
+            if (!string.IsNullOrEmpty(accessToken))
+            {
+                await _spotifyClient.SetTokenAsync(accessToken);
+                var user = await _spotifyClient.GetCurrentUserIdAsync();
+                UserName = user.DisplayName ?? "";
+                ProfileImageUrl = user.Images.FirstOrDefault()?.Url ?? "";
+            }
+        }
+        catch (Exception)
+        {
+            // Non-critical: profile photo is cosmetic
+        }
+
         var cachedCount = await _dbContext.GetCachedTrackCountAsync();
         if (cachedCount > 0)
         {
@@ -270,7 +305,8 @@ public class LibraryViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Scan failed: {ex.Message}";
+            _logger.LogError(ex, "Library scan failed");
+            StatusMessage = "Something went wrong while scanning your library. Please try again.";
         }
         finally
         {

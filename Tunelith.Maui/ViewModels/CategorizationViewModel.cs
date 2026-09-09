@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Tunelith.Core.Models;
 using Tunelith.Core.Services;
 using Tunelith.Data;
@@ -10,6 +11,7 @@ public class CategorizationViewModel : ViewModelBase
     private readonly TunelithDbContext _dbContext;
     private readonly CategorizationEngine _categorizationEngine;
     private readonly DuplicateDetector _duplicateDetector;
+    private readonly ILogger<CategorizationViewModel> _logger;
 
     private bool _isProcessing;
     public bool IsProcessing
@@ -54,12 +56,14 @@ public class CategorizationViewModel : ViewModelBase
         ISpotifyApiClient spotifyClient,
         TunelithDbContext dbContext,
         CategorizationEngine categorizationEngine,
-        DuplicateDetector duplicateDetector)
+        DuplicateDetector duplicateDetector,
+        ILogger<CategorizationViewModel> logger)
     {
         _spotifyClient = spotifyClient;
         _dbContext = dbContext;
         _categorizationEngine = categorizationEngine;
         _duplicateDetector = duplicateDetector;
+        _logger = logger;
 
         RunCategorizationCommand = new AsyncRelayCommand(RunCategorizationAsync);
     }
@@ -151,7 +155,8 @@ public class CategorizationViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            _logger.LogError(ex, "Categorization failed");
+            StatusMessage = "Categorization failed. Please try again.";
         }
         finally
         {

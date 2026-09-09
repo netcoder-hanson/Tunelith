@@ -44,9 +44,18 @@
                 <Frame.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding LogoutCommand}"/>
                 </Frame.GestureRecognizers>
-                <Image Source="{Binding ProfileImageUrl}"
-                       Aspect="AspectFill"
-                       HeightRequest="40" WidthRequest="40"/>
+                <Grid>
+                    <!-- Fallback: emoji when no profile photo -->
+                    <Label Text="👤"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                    <!-- Overlay: actual photo when available -->
+                    <Image Source="{Binding ProfileImageUrl}"
+                           Aspect="AspectFill"
+                           HeightRequest="40" WidthRequest="40"
+                           Opacity="{Binding ProfileImageUrl, Converter={StaticResource StringToImageOpacityConverter}}"/>
+                </Grid>
             </Frame>
         </Grid>
 

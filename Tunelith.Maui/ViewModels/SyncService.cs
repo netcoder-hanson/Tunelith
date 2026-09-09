@@ -20,12 +20,15 @@ public class SyncService
 
     /// <summary>
     /// Applies all pending changes to Spotify: creates new playlists and removes confirmed duplicates.
+    /// If specificTrackIdsToRemove is provided (from per-track toggles), only those tracks are removed.
+    /// Otherwise, removes all tracks except the first in each group (approve-all behavior).
     /// Returns (playlistsCreated, duplicatesRemoved) for the success screen.
     /// </summary>
     public async Task<(int PlaylistsCreated, int DuplicatesRemoved)> ApplyAsync(
         List<PlaylistChange> playlistsToCreate,
         List<DuplicateGroup> duplicatesToRemove,
-        int totalTracksResorted)
+        int totalTracksResorted,
+        HashSet<string>? specificTrackIdsToRemove = null)
     {
         var accessToken = await SecureStorage.GetAsync("spotify_access_token");
         if (string.IsNullOrEmpty(accessToken))
@@ -53,7 +56,22 @@ public class SyncService
         {
             if (duplicate.Tracks.Count > 1)
             {
-                var trackIdsToRemove = duplicate.Tracks.Skip(1).Select(t => t.Id).ToList();
+                List<string> trackIdsToRemove;
+
+                if (specificTrackIdsToRemove != null)
+                {
+                    // Honor per-track toggle: only remove tracks the user confirmed as duplicates
+                    trackIdsToRemove = duplicate.Tracks
+                        .Where(t => specificTrackIdsToRemove.Contains(t.Id))
+                        .Select(t => t.Id)
+                        .ToList();
+                }
+                else
+                {
+                    // Approve-all: remove everything except the first track
+                    trackIdsToRemove = duplicate.Tracks.Skip(1).Select(t => t.Id).ToList();
+                }
+
                 if (trackIdsToRemove.Any())
                 {
                     await _spotifyClient.RemoveSavedTracksAsync(trackIdsToRemove);

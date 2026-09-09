@@ -131,10 +131,10 @@ public class LibraryViewModel : ViewModelBase
             TotalTracks = cachedCount + Playlists.Sum(p => p.TotalTracks);
         }
 
-        HasAnalysis = cachedCount > 0;
-
-        // Load health score from last scan
+        // Load health score and analysis state from last scan
         var lastScan = await _dbContext.GetLastScanHistoryAsync();
+        HasAnalysis = lastScan != null;
+
         if (lastScan != null)
         {
             HealthScore = lastScan.HealthScore;

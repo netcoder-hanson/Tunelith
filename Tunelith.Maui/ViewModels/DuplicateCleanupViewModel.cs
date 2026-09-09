@@ -74,16 +74,19 @@ public class DuplicateCleanupViewModel : ViewModelBase
 
         try
         {
+            // Build the exact set of track IDs the user toggled ON (marked as duplicates to remove)
+            var trackIdsToRemove = new HashSet<string>(
+                DuplicateItems
+                    .Where(i => i.IsDuplicate)
+                    .Select(i => i.Track.Id));
+
             // Reconcile per-track toggles back into DuplicateGroup.IsConfirmed
-            // A group is confirmed only if ALL its non-first tracks are still toggled on
             foreach (var group in _session.Duplicates)
             {
                 var groupItems = DuplicateItems
                     .Where(i => i.GroupId == group.NormalizedKey)
                     .ToList();
 
-                // First track in group is always kept (not a duplicate).
-                // Group is confirmed if any of the later tracks are still marked as duplicate.
                 var laterTracksConfirmed = groupItems
                     .Skip(1)
                     .Any(i => i.IsDuplicate);
@@ -91,12 +94,10 @@ public class DuplicateCleanupViewModel : ViewModelBase
                 group.IsConfirmed = laterTracksConfirmed;
             }
 
-            // Build the list of confirmed duplicates for removal
             var confirmedDuplicates = _session.Duplicates
                 .Where(d => d.IsConfirmed)
                 .ToList();
 
-            // Build playlist creation list from categories (same as ChangeReportViewModel)
             var categorizationResult = _session.CategorizationResult;
             var playlistsToCreate = categorizationResult?.Categories
                 .Select(c => new PlaylistChange
@@ -110,11 +111,12 @@ public class DuplicateCleanupViewModel : ViewModelBase
 
             int totalTracksResorted = categorizationResult?.TrackCategoryMap.Count ?? 0;
 
-            // Apply via shared service
+            // Pass specific track IDs so SyncService honors per-track toggle choices
             await _syncService.ApplyAsync(
                 playlistsToCreate,
                 confirmedDuplicates,
-                totalTracksResorted);
+                totalTracksResorted,
+                trackIdsToRemove);
 
             StatusMessage = "Changes applied successfully!";
             await Shell.Current.GoToAsync("LibraryMasteredPage");

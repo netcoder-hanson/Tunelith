@@ -7,7 +7,6 @@ public class SmartDuplicateKeeper
     /// <summary>
     /// Selects the best track to keep from a duplicate group based on:
     /// - Has album art (images) = +3 pts
-    /// - Explicit version = +2 pts (often better production)
     /// - Longer duration = +1 pt (may be complete version)
     /// - Has audio features available = +1 pt (more complete metadata)
     /// Returns the index of the best track in the group.
